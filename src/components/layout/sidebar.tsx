@@ -2,18 +2,18 @@
 
 import { GoSidebarExpand } from 'react-icons/go';
 import { Logo } from '../ui/logo';
-import { Button } from '../ui/button';
 import { FiHome, FiLogOut } from 'react-icons/fi';
 import { FiPackage } from 'react-icons/fi';
 import { FiUser } from 'react-icons/fi';
 import { FiSettings } from 'react-icons/fi';
 import { GoSidebarCollapse } from 'react-icons/go';
-import { useState } from 'react';
+import { AnchorHTMLAttributes, useState } from 'react';
+import { usePathname } from 'next/navigation';
+import Link from 'next/link';
 
 export function Sidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false);
-
-  const href = '/dashboard';
+  const href = usePathname();
 
   const navLinks = {
     mainLinks: [
@@ -28,7 +28,7 @@ export function Sidebar() {
       },
       {
         name: 'Produtos',
-        href: '/produtos',
+        href: '/products',
         icon: (
           <FiPackage
             className={` transition-all duration-300 ${!isCollapsed ? 'text-lg' : 'text-2xl'}`}
@@ -40,7 +40,7 @@ export function Sidebar() {
     systemLinks: [
       {
         name: 'Perfil',
-        href: '/perfil',
+        href: '/profile',
         icon: (
           <FiUser
             className={` transition-all duration-300 ${!isCollapsed ? 'text-lg' : 'text-2xl'}`}
@@ -49,7 +49,7 @@ export function Sidebar() {
       },
       {
         name: 'Configurações',
-        href: '/configuracoes',
+        href: '/settings',
         icon: (
           <FiSettings
             className={` transition-all duration-300 ${!isCollapsed ? 'text-lg' : 'text-2xl'}`}
@@ -98,7 +98,7 @@ export function Sidebar() {
             {navLinks.mainLinks.map(link => {
               if (link.href === href) {
                 return (
-                  <Button
+                  <NavLink
                     key={link.href}
                     text={link.name}
                     icon={link.icon}
@@ -106,12 +106,13 @@ export function Sidebar() {
                     alingment={!isCollapsed ? 'left' : 'center'}
                     collapse={isCollapsed}
                     className={` ${isCollapsed && 'py-6 flex items-center justify-center'}`}
+                    href={link.href}
                   />
                 );
               }
 
               return (
-                <Button
+                <NavLink
                   key={link.href}
                   text={link.name}
                   icon={link.icon}
@@ -119,6 +120,7 @@ export function Sidebar() {
                   alingment={!isCollapsed ? 'left' : 'center'}
                   collapse={isCollapsed}
                   className={`${isCollapsed && 'py-6 flex items-center justify-center'}`}
+                  href={link.href}
                 />
               );
             })}
@@ -134,7 +136,7 @@ export function Sidebar() {
             {navLinks.systemLinks.map(link => {
               if (link.href === href) {
                 return (
-                  <Button
+                  <NavLink
                     key={link.href}
                     text={link.name}
                     icon={link.icon}
@@ -142,12 +144,13 @@ export function Sidebar() {
                     alingment={!isCollapsed ? 'left' : 'center'}
                     collapse={isCollapsed}
                     className={`${isCollapsed && 'py-6 flex items-center justify-center'}`}
+                    href={link.href}
                   />
                 );
               }
 
               return (
-                <Button
+                <NavLink
                   key={link.href}
                   text={link.name}
                   icon={link.icon}
@@ -155,6 +158,7 @@ export function Sidebar() {
                   alingment={!isCollapsed ? 'left' : 'center'}
                   collapse={isCollapsed}
                   className={`${isCollapsed && 'py-6 flex items-center justify-center'}`}
+                  href={link.href}
                 />
               );
             })}
@@ -162,15 +166,70 @@ export function Sidebar() {
         </div>
       </div>
 
+      {/* SAIR */}
       <div>
-        <Button
-          className={`hover:bg-error ${isCollapsed && 'py-6 flex items-center justify-center'}`}
+        <NavLink
           text={isCollapsed ? '' : 'Sair'}
           icon={<FiLogOut size={18} />}
+          href="/dashboard"
           variant="secondary"
           alingment={!isCollapsed ? 'left' : 'center'}
+          collapse={isCollapsed}
+          className={`hover:bg-error ${isCollapsed && 'py-6 flex items-center justify-center '}`}
         />
       </div>
     </aside>
+  );
+}
+
+type variantButton = 'primary' | 'secondary' | 'tertiary';
+
+type ButtonProps = {
+  text?: string;
+  icon?: React.ReactNode;
+  variant: variantButton;
+  alingment?: 'left' | 'center';
+  collapse?: boolean;
+  href: string;
+} & AnchorHTMLAttributes<HTMLAnchorElement>;
+
+function NavLink({
+  text,
+  icon,
+  variant,
+  alingment = 'left',
+  collapse = false,
+  ...props
+}: ButtonProps) {
+  
+
+  const variantsButton: Record<variantButton, string> = {
+    primary:
+      'bg-primary-normal text-white hover:bg-primary-hover transition-colors duration-200',
+
+    secondary:
+      'bg-secondary-dark text-white hover:bg-[#0F172A] transition-colors duration-200 ',
+
+    tertiary:
+      'bg-background-normal text-secondary-dark border border-secondary-light/20 hover:bg-[#E5E7EB] hover:border-secondary-light/40 transition-colors duration-200',
+  };
+
+  return (
+    <Link
+      {...props}
+      className={`block max-h-10 py-2 px-4 w-full rounded-lg cursor-pointer  ${variantsButton[variant]} ${props.className}`}
+    >
+      <div
+        className={`flex ${alingment === 'left' ? 'justify-start' : 'justify-center'} items-center ${!collapse && 'gap-2'}`}
+      >
+        {icon}
+
+        <span
+          className={`transition-all ease-in-out duration-200  ${!collapse ? 'opacity-100' : 'opacity-0 w-0'}`}
+        >
+          {text}
+        </span>
+      </div>
+    </Link>
   );
 }

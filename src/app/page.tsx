@@ -2,22 +2,28 @@ import { CardMain } from '@/components/layout/cardMain';
 import { NavBar } from '@/components/layout/navBar';
 import { Sidebar } from '@/components/layout/sidebar';
 import { CardDashboard } from './(private)/dashboard/_components/cardDashboard';
+import { CardProductLowStock } from './(private)/dashboard/_components/cardProductLowStock';
+import { TitleSection } from '@/components/ui/titleSection';
+import { FiBox } from 'react-icons/fi';
+import { Tags } from './(private)/dashboard/_components/tags';
 
 export default function Home() {
+
+  const tags = [
+    'Todas',
+    'Jaquetas',
+    'Saias',
+    'Blusas',
+    'Calças',
+    'Vestidos',
+    'blazers',
+    'Shorts',
+    'Camisas',
+  ];
+
   return (
-    <div className='bg-background-normal'>
-      <div className=" p-6 h-screen flex gap-6 ">
-        <Sidebar />
-        <div className='flex flex-col gap-6 w-full'>
-          <NavBar />
-          <div className='max-h-43.75 h-full grid grid-cols-3 gap-6'>
-            <CardDashboard />
-            <CardDashboard />
-            <CardDashboard />
-          </div>
-          <CardMain />
-        </div>
-      </div>
+    <div className="bg-background-normal">
+      hellow world
     </div>
   );
 }

@@ -7,6 +7,7 @@
 
 @theme {
   --color-primary-normal: #3B82F6;
+  --color-primary-hover: #2563EB;
 
   --color-secondary-dark: #111827;
   --color-secondary-normal: #374151;
@@ -17,6 +18,25 @@
   --color-success: #22C55E;
   --color-error: #EF4444;
   --color-warning: #F59E0B;
+
+  --shadow-card:  0px 2px 6px rgba(17, 24, 39, 0.1);;
 }
 
 
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #FFF;
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #6B7280;
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #374151;
+}

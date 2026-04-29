@@ -1,15 +1,26 @@
+'use client';
+
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { FiBell } from "react-icons/fi";
 
 
 
 export function NavBar() {
-  
 
+  const href = usePathname();
+
+  const links = {
+    dashboard: "Dashboard",
+    products: "Produtos",
+    profile: "Perfil",
+  }
+
+  
 
   return (
     <header className="max-h-17.5 bg-white w-full rounded-3xl py-3 px-6 flex items-center justify-between border border-secondary-light/20">
-     <span className="text-secondary-dark text-lg ">Dashboard</span>
+     <span className="text-secondary-dark text-lg ">{  links[href.split("/")[1]]}</span>
 
      <div className="flex items-center gap-4">
       <div className="cursor-pointer">

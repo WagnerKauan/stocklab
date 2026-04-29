@@ -34,7 +34,7 @@ export function Button({
   return (
     <button
       {...props}
-      className={`max-h-10 py-2 px-4 w-full rounded-lg cursor-pointer ${variantsButton[variant]} ${props.className}`}
+      className={`max-h-10 py-2 px-4 w-full rounded-lg cursor-pointer  ${variantsButton[variant]} ${props.className}`}
     >
       <div
         className={`flex ${alingment === 'left' ? 'justify-start' : 'justify-center'} items-center ${!collapse && 'gap-2'}`}
@@ -43,7 +43,7 @@ export function Button({
         {icon}
 
         <span
-          className={`transition-all ease-in-out duration-200 ${!collapse ? 'opacity-100' : 'opacity-0 w-0'}`}
+          className={`transition-all ease-in-out duration-200  ${!collapse ? 'opacity-100' : 'opacity-0 w-0'}`}
         >
           {text}
         </span>

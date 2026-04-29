@@ -1,0 +1,2 @@
+export const MINIMUM_STOCK_VARIANTS = 10;
+export const MINIMUM_STOCK_PRODUCT = 50;
