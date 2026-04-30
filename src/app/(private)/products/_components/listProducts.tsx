@@ -61,6 +61,7 @@ export function ListProducts({ products }: ListProductsProps) {
 
       <div className="flex-1 h-full overflow-y-auto pr-2">
         {/* Header - desktop */}
+        
         <div className="hidden md:grid grid-cols-[2.5fr_1fr_1fr_1fr_80px] gap-4 bg-primary-normal text-white rounded-xl px-6 py-4 sticky top-0 z-10">
           <span className="text-sm font-medium">Produto</span>
           <span className="text-sm font-medium">Categoria</span>
