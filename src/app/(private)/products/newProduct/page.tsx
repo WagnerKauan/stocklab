@@ -5,7 +5,7 @@ import { VariationsTable } from '@/../src/app/(private)/products/newProduct/_com
 export default function NewProduct() {
   return (
     <CardMain>
-      <div className="max-w-187.5 w-full mx-auto">
+      <div className="max-w-187.5 w-full mx-auto flex flex-col h-full  gap-6">
         <div className="flex flex-col items-center border-b border-secondary-light/20 pb-2">
           <h1 className="text-[28px] text-secondary-dark">
             Crie um novo produto
@@ -48,6 +48,10 @@ export default function NewProduct() {
         <DropImage />
 
         <VariationsTable />
+
+        <button className="cursor-pointer px-6 py-3 bg-[#4A7CF7] text-white rounded-lg hover:bg-[#3A66C7] transition-colors">
+          Criar Produto
+        </button>
       </div>
     </CardMain>
   );

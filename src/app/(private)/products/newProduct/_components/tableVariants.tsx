@@ -11,7 +11,7 @@ function formatPrice(val: string) {
 
 export function VariationsTable() {
   const [variants, setVariants] = useState<Variant[]>([
-    { size: 'GG', color: 'Branco', stock: '120', price:  '90,00' },
+    { size: '', color: '', stock: '', price: '' },
   ]);
 
   const update = useCallback(
@@ -37,9 +37,10 @@ export function VariationsTable() {
     );
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-3 h-full overflow-hidden">
       {/* Desktop */}
-      <div className="hidden md:block border border-secondary-light/20 rounded-xl overflow-hidden">
+
+      <div className="hidden md:block border border-secondary-light/20 rounded-xl flex-1 overflow-y-auto">
         <table className="w-full border-collapse table-fixed">
           <thead className="bg-[#4A7CF7]">
             <tr>
@@ -86,7 +87,7 @@ export function VariationsTable() {
                   <input
                     className="w-full py-1.5 text-sm bg-transparent border-none outline-none text-primary placeholder:text-tertiary"
                     type="text"
-                    placeholder="0"
+                    placeholder="estoque"
                     value={v.stock}
                     onChange={e => update(i, 'stock', e.target.value)}
                   />
@@ -95,7 +96,7 @@ export function VariationsTable() {
                   <input
                     className="w-full py-1.5 text-sm bg-transparent border-none outline-none text-primary placeholder:text-tertiary text-right"
                     type="text"
-                    placeholder="0,00"
+                    placeholder="Preço"
                     value={v.price}
                     onChange={e => update(i, 'price', e.target.value)}
                     onBlur={e => handleBlurPrice(i, e.target.value)}
@@ -184,7 +185,7 @@ export function VariationsTable() {
       <div className="flex justify-end">
         <button
           onClick={addRow}
-          className="flex items-center gap-1.5 px-5 py-2.5 text-[13px] font-medium bg-[#1C2A4A] text-white rounded-lg hover:opacity-90 transition-opacity"
+          className="flex items-center cursor-pointer gap-1.5 px-5 py-2.5 text-[13px] font-medium bg-[#1C2A4A] text-white rounded-lg hover:opacity-90 transition-opacity"
         >
           <span className="text-base leading-none">+</span> Variação
         </button>

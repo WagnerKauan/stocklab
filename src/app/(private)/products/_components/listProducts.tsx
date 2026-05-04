@@ -3,6 +3,7 @@ import { ProductModel } from '@/models/product/product-model';
 import { FiMoreHorizontal, FiSearch } from 'react-icons/fi';
 import { useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 type ListProductsProps = {
   products: ProductModel[];
@@ -124,12 +125,12 @@ export function ListProducts({ products }: ListProductsProps) {
 
                   {/* Ações */}
                   <div className="flex justify-center">
-                    <button className="cursor-pointer">
+                    <Link className="cursor-pointer" href={`/products/${product.id}`}>
                       <FiMoreHorizontal
                         size={20}
                         className="text-secondary-dark hover:text-primary-normal transition-colors"
                       />
-                    </button>
+                    </Link>
                   </div>
                 </div>
 

@@ -1,14 +1,14 @@
-type StockIconProps = {
+type VariantIconProps = {
   size?: number;
   color?: string;
   strokeWidth?: number;
 };
 
-export function StockIcon({
+export function VariantIcon({
   size = 24,
   color = 'currentColor',
   strokeWidth = 2,
-}: StockIconProps) {
+}: VariantIconProps) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -21,15 +21,11 @@ export function StockIcon({
       strokeLinecap="round"
       strokeLinejoin="round"
     >
-      <circle cx="6" cy="19" r="2" />
+      <rect x="3" y="10" width="10" height="10" rx="2" />
 
-      <path d="M6 17V5a2 2 0 0 0-2-2H3" />
-      <line x1="6" y1="17" x2="18" y2="17" />
+      <rect x="7" y="6" width="10" height="10" rx="2" />
 
-      <rect x="6" y="7" width="10" height="10" rx="1" />
-
-      <line x1="6" y1="12" x2="16" y2="12" />
-      <line x1="11" y1="7" x2="11" y2="12" />
+      <rect x="11" y="3" width="10" height="10" rx="2" />
     </svg>
   );
 }

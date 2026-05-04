@@ -36,7 +36,7 @@ export function DropImage({ onFile, label = 'Arraste ou clique para adicionar im
 
   return (
     <label
-      className={`group relative block w-full cursor-pointer rounded-2xl border-2 border-dashed p-6 text-center transition ${
+      className={`group relative block w-full cursor-pointer rounded-2xl border-2 border-dashed p-4 text-center transition ${
         dragActive ? 'border-secondary-dark bg-secondary-light/10' : 'border-secondary-light/50 bg-background-normal'
       }`}
       onDragEnter={() => setDragActive(true)}

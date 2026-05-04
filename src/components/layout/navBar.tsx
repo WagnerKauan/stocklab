@@ -16,7 +16,7 @@ export function NavBar() {
 
   return (
     <header className="max-h-17.5 bg-white w-full rounded-3xl py-3 px-6 flex items-center justify-between border border-secondary-light/20">
-      <span className="text-secondary-dark text-lg ">{links[href]}</span>
+      <span className="text-secondary-dark text-lg ">{links[href] || 'Informações do produto'}</span>
 
       <div className="flex items-center gap-4">
         <div className="cursor-pointer">

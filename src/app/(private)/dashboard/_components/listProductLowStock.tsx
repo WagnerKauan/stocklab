@@ -13,6 +13,7 @@ export function ListProductLowStock({
 }: {
   products: ProductModel[];
 }) {
+  const [tagActive, setTagActive] = useState('Todas');
   const [filteredProducts, setFilteredProducts] =
     useState<ProductModel[]>(products);
 
@@ -25,6 +26,7 @@ export function ListProductLowStock({
 
   function handleTagClick(tag: string) {
     // Lógica para filtrar os produtos com base na tag selecionada
+    setTagActive(tag);
     setFilteredProducts(
       products.filter(
         product => product.category === tag.toLowerCase() || tag === 'Todas',
@@ -37,8 +39,8 @@ export function ListProductLowStock({
       <div className="flex items-center gap-4">
         {tags.map(tag => (
           <button
-            className="flex items-center justify-center bg-background-normal rounded-lg px-8 py-2 text-[14px]
-    hover:bg-secondary-normal hover:text-white text-secondary-normal cursor-pointer transition-colors"
+            className={`flex items-center justify-center bg-background-normal rounded-lg px-8 py-2 text-[14px]
+          hover:bg-secondary-normal hover:text-white text-secondary-normal cursor-pointer transition-colors ${tagActive === tag ? 'bg-secondary-normal text-white' : ''}`}
             onClick={() => handleTagClick(tag)}
             key={tag}
           >

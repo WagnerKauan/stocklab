@@ -4,7 +4,7 @@ type StockIconProps = {
   strokeWidth?: number;
 };
 
-export function StockIcon({
+export function ClipboardIcon({
   size = 24,
   color = 'currentColor',
   strokeWidth = 2,
@@ -21,15 +21,12 @@ export function StockIcon({
       strokeLinecap="round"
       strokeLinejoin="round"
     >
-      <circle cx="6" cy="19" r="2" />
+      <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+      <rect x="8" y="2" width="8" height="4" rx="1" />
 
-      <path d="M6 17V5a2 2 0 0 0-2-2H3" />
-      <line x1="6" y1="17" x2="18" y2="17" />
-
-      <rect x="6" y="7" width="10" height="10" rx="1" />
-
-      <line x1="6" y1="12" x2="16" y2="12" />
-      <line x1="11" y1="7" x2="11" y2="12" />
+      <line x1="8" y1="10" x2="16" y2="10" />
+      <line x1="8" y1="14" x2="16" y2="14" />
+      <line x1="8" y1="18" x2="12" y2="18" />
     </svg>
   );
 }
