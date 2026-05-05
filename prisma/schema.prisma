@@ -1,0 +1,92 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+
+enum MovementType {
+  IN
+  OUT
+}
+
+enum Category {
+  roupa
+  calcado
+  acessorio
+}
+
+model User {
+  id String @id @default(cuid())
+  name String
+  email  String @unique
+  password String
+  image String?
+  createdAt DateTime @default(now())
+
+  userSettings UserSettings?
+  products Product[]
+}
+
+
+model UserSettings  {
+  id            String @id @default(cuid())
+  userId        String @unique
+  theme         String?
+  lowStockAlert Int?
+  lowVariantAlert Int? 
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+
+model Product {
+  id String @id @default(cuid())
+  userId String
+  name String
+  image String?
+  typeProduct String
+  category Category
+
+  user User @relation(fields: [userId], references: [id])
+  variants  Variant[]
+  stockMovements StockMovement[]
+}
+
+
+model Variant {
+  id String @id @default(cuid())
+  productId String
+  size String?
+  color String?
+  stock Int
+  priceInCents Int
+  sku String?
+  stockMovements StockMovement[]
+
+  product Product @relation(fields: [productId], references: [id])
+  @@unique([productId, size, color])
+  @@index([productId])
+}
+
+
+model StockMovement {
+  id        String   @id @default(cuid())
+  productId String
+  variantId String?
+  type      MovementType
+  quantity  Int
+  createdAt DateTime @default(now())
+  product  Product  @relation(fields: [productId], references: [id])
+  variant  Variant? @relation(fields: [variantId], references: [id])
+  @@index([productId])
+  @@index([variantId])
+}

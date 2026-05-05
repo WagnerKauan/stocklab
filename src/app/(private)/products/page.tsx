@@ -1,9 +1,8 @@
 import { CardMain } from '@/components/layout/cardMain';
 import { TitleSection } from '@/components/ui/titleSection';
 import { productRepository } from '@/repository/product';
-import Image from 'next/image';
 import Link from 'next/link';
-import { FiMoreHorizontal, FiPackage, FiSearch } from 'react-icons/fi';
+import { FiPackage,  } from 'react-icons/fi';
 import { FiPlus } from 'react-icons/fi';
 import { ListProducts } from './_components/listProducts';
 

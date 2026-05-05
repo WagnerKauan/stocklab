@@ -24,10 +24,6 @@ export function CardProductLowStock({
   minimumStock,
   variants,
 }: CardProductLowStockProps) {
-  const progress = Math.min((stock / minimumStock) * 100, 100);
-
-  const progressColor =
-    progress > 50 ? 'bg-success' : progress > 20 ? 'bg-warning' : 'bg-error';
 
   const isHalfStock = variants.every(
     variant => variant.stock >= MINIMUM_STOCK_VARIANTS / 2,

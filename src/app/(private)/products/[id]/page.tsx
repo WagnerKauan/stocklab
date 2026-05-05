@@ -8,6 +8,7 @@ import { CardInfo } from './_components/cardInfo';
 import { VariantIcon } from '@/components/icons/variantIcon';
 import { StockIcon } from '@/components/icons/stockIcon';
 import { MINIMUM_STOCK_VARIANTS } from '@/settings/variablesGlobal';
+import Link from 'next/link';
 
 export default async function ProductDetailPage({
   params,
@@ -77,21 +78,25 @@ export default async function ProductDetailPage({
           typeTitle="info"
         />
 
-        <button className="flex items-center cursor-pointer gap-1.5 px-5 py-2.5 text-[13px] font-medium bg-primary-normal text-white rounded-lg hover:opacity-90 transition-opacity">
+        <Link
+          href={`/products/${id}/edit`}
+          className="flex items-center cursor-pointer gap-1.5 px-5 py-2.5 text-[13px] font-medium 
+          bg-primary-normal text-white rounded-lg hover:opacity-90 transition-opacity"
+        >
           <FiEdit2 size={20} color="#FFF" />
           Editar produto
-        </button>
+        </Link>
       </div>
 
       <div className="flex gap-8 mt-8">
-        <div className="w-100 h-125 relative rounded-2xl overflow-hidden shadow-card ">
+        <div className="w-100 h-125 rounded-2xl overflow-hidden shadow-card ">
           <Image
             src={product.productImage}
             alt={product.name}
-            
-            className="object-cover"
+            className="object-cover h-full w-full"
             priority
-            fill
+            width={400}
+            height={500}
           />
         </div>
 
@@ -113,21 +118,23 @@ export default async function ProductDetailPage({
           <div className="border border-secondary-light/20 rounded-xl overflow-y-auto h-full">
             <table className="w-full border-collapse table-fixed">
               <thead className="bg-primary-normal">
-                <th className="text-center text-[13px] font-medium text-white px-4 py-3">
-                  Tamanho
-                </th>
-                <th className="text-center text-[13px] font-medium text-white px-4 py-3">
-                  Cor
-                </th>
-                <th className="text-center text-[13px] font-medium text-white px-4 py-3">
-                  Estoque
-                </th>
-                <th className="text-center text-[13px] font-medium text-white px-4 py-3">
-                  Status
-                </th>
-                <th className="text-center text-[13px] font-medium text-white px-4 py-3">
-                  Preço
-                </th>
+                <tr>
+                  <th className="text-center text-[13px] font-medium text-white px-4 py-3">
+                    Tamanho
+                  </th>
+                  <th className="text-center text-[13px] font-medium text-white px-4 py-3">
+                    Cor
+                  </th>
+                  <th className="text-center text-[13px] font-medium text-white px-4 py-3">
+                    Estoque
+                  </th>
+                  <th className="text-center text-[13px] font-medium text-white px-4 py-3">
+                    Status
+                  </th>
+                  <th className="text-center text-[13px] font-medium text-white px-4 py-3">
+                    Preço
+                  </th>
+                </tr>
               </thead>
 
               <tbody>
@@ -160,7 +167,7 @@ export default async function ProductDetailPage({
 
                       <td className=" flex items-center text-center justify-center py-1.5">
                         <span
-                          className={` ${colorStatus[variantStatus]} py-1 w-full max-w-[80px] text-sm text-center  text-white rounded-lg  gap-1`}
+                          className={` ${colorStatus[variantStatus]} py-1 w-full max-w-20 text-sm text-center  text-white rounded-lg  gap-1`}
                         >
                           {variantStatus}
                         </span>

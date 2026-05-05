@@ -6,10 +6,11 @@ import { FiImage } from "react-icons/fi";
 type DropImageProps = {
   onFile?: (file: File) => void;
   label?: string;
+  imgPreview: string | null;
 };
 
-export function DropImage({ onFile, label = 'Arraste ou clique para adicionar imagem' }: DropImageProps) {
-  const [preview, setPreview] = useState<string | null>(null);
+export function DropImage({ onFile, imgPreview, label = 'Arraste ou clique para adicionar imagem' }: DropImageProps) {
+  const [preview, setPreview] = useState<string | null>(imgPreview);
   const [dragActive, setDragActive] = useState(false);
 
   const handleFile = useCallback(
@@ -22,7 +23,7 @@ export function DropImage({ onFile, label = 'Arraste ou clique para adicionar im
     [onFile],
   );
 
-  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
+  const handleDrop = (event: React.DragEvent<HTMLLabelElement>) => {
     event.preventDefault();
     setDragActive(false);
     const file = event.dataTransfer.files?.[0];
@@ -36,7 +37,7 @@ export function DropImage({ onFile, label = 'Arraste ou clique para adicionar im
 
   return (
     <label
-      className={`group relative block w-full cursor-pointer rounded-2xl border-2 border-dashed p-4 text-center transition ${
+      className={`group relative block w-full cursor-pointer rounded-2xl border-2 border-dashed p-2 text-center transition ${
         dragActive ? 'border-secondary-dark bg-secondary-light/10' : 'border-secondary-light/50 bg-background-normal'
       }`}
       onDragEnter={() => setDragActive(true)}
@@ -58,7 +59,7 @@ export function DropImage({ onFile, label = 'Arraste ou clique para adicionar im
         <img
           src={preview}
           alt="Preview"
-          className="mx-auto h-48 w-full max-w-xs rounded-xl object-cover"
+          className="mx-auto h-24 w-full max-w-24 rounded-xl object-cover"
         />
       ) : (
         <div className="flex flex-col items-center justify-center gap-3">

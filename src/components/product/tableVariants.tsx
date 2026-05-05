@@ -1,19 +1,26 @@
 'use client';
+import { ProductVariant } from '@/models/product/product-model';
 import { useState, useCallback } from 'react';
 
-type Variant = { size: string; color: string; stock: string; price: string };
+type Variant =  Omit<ProductVariant, 'id'>;
 const empty = (): Variant => ({ size: '', color: '', stock: '', price: '' });
+
 
 function formatPrice(val: string) {
   const n = parseFloat(val.replace(',', '.'));
   return isNaN(n) ? val : n.toFixed(2).replace('.', ',');
 }
 
-export function VariationsTable() {
-  const [variants, setVariants] = useState<Variant[]>([
-    { size: '', color: '', stock: '', price: '' },
-  ]);
+type VariationsTableProps = {
+  variants: Variant[];
+  setVariants: React.Dispatch<React.SetStateAction<Variant[]>>;
+};
 
+export function VariationsTable({
+  variants,
+  setVariants,
+}: VariationsTableProps) {
+  
   const update = useCallback(
     (i: number, field: keyof Variant, value: string) => {
       setVariants(prev =>
