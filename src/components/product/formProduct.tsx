@@ -4,23 +4,42 @@ import { ProductModel } from '@/models/product/product-model';
 import { DropImage } from './dropImage';
 import { VariationsTable } from './tableVariants';
 import { useState } from 'react';
+import { productSchema } from '@/schemas/product/product.schema';
+import { InputWithLabel } from '../ui/input';
+import { SelectWithLabel } from '../ui/select';
+import { variantSchema } from '@/schemas/product/variant.schema';
+import { createProduct } from '@/actions/product/create-product';
+import { v4 as uuidv4 } from 'uuid';
+
+/*
+  PRECISO TRABALHAR NA FUNÇÃO HANDLEONBLUR VERIFICAR SE O ERRO JÁ EXISTE E COLOCAR ID COMO PARAMETRO OPCIONAL NO HANDLEONBLUR
+*/
 
 type FormProductProps = {
   initialData?: ProductModel;
 };
 
-export function FormProduct({ initialData }: FormProductProps) {
+export type ErrorInput = {
+  id?: string;
+  message: string;
+  field: string;
+};
 
-  const [variants, setVariants] = useState(initialData?.variants || [
-    { size: '', color: '', stock: '', price: '' },
-  ]);
+export function FormProduct({ initialData }: FormProductProps) {
+  const [variants, setVariants] = useState(
+    initialData?.variants || [
+      { id: uuidv4(), size: '', color: '', stock: 0, priceInCents: 0 },
+    ],
+  );
 
   const [product, setProduct] = useState({
     name: initialData?.name || '',
     category: initialData?.category || '',
     typeProduct: initialData?.typeProduct || '',
-    image: initialData?.productImage || '',
+    productImage: initialData?.productImage || '',
   });
+
+  const [errors, setErrors] = useState<ErrorInput[]>([]);
 
   const handleChange = (field: string, value: string) => {
     setProduct(prev => ({
@@ -28,6 +47,62 @@ export function FormProduct({ initialData }: FormProductProps) {
       [field]: value,
     }));
   };
+
+  function handleOnBlur(
+    field: string,
+    value: string | number,
+    id?: string,
+  ): boolean {
+    if (
+      (!isNaN(Number(value)) && field === 'priceInCents') ||
+      field === 'stock'
+    ) {
+      value = Number(value);
+    }
+
+    const fieldSchema =
+      productSchema.shape[field as keyof typeof productSchema.shape] ||
+      variantSchema.shape[field as keyof typeof variantSchema.shape];
+
+    const isValidField = fieldSchema.safeParse(value);
+
+    if (!isValidField?.success) {
+      setErrors(prev => [
+        ...prev,
+        {
+          id,
+          message: isValidField.error.issues[0].message,
+          field: field,
+        },
+      ]);
+      return true;
+    }
+
+    setErrors(prev =>
+      prev.filter(err => err.field !== field || err?.id !== id),
+    );
+
+    return false;
+  }
+
+  async function handleSubmit() {
+    const data = {
+      ...product,
+      variants,
+    };
+
+    const isProductValid = productSchema.safeParse(product);
+    const isVariantsValid = variants.every(variant =>
+      variantSchema.safeParse(variant),
+    );
+
+    if (!isProductValid.success || !isVariantsValid) {
+      console.log('Dados inválidos');
+      return;
+    }
+
+    const response = await createProduct(data);
+  }
 
   return (
     <div className="max-w-187.5 w-full mx-auto flex flex-col h-full  gap-6">
@@ -42,59 +117,63 @@ export function FormProduct({ initialData }: FormProductProps) {
         </p>
       </div>
 
-      <div className="flex-1">
-        <label htmlFor="name" className="text-secondary-normal">
-          Nome
-        </label>
-        <input
-          type="text"
-          id="name"
+      <div className="flex-1 relative">
+        <InputWithLabel
+          field="name"
+          label="Nome"
           placeholder="Ex: Calça Jeans"
-          className="w-full p-2 rounded-lg bg-background-normal border border-secondary-light/10 text-secondary-normal focus:outline-secondary-light/20"
-          onChange={e => handleChange('name', e.target.value)}
+          handleChange={handleChange}
           value={product.name}
+          handleOnBlur={handleOnBlur}
+          errors={errors}
         />
       </div>
 
       <div className="flex items-center gap-4">
-        <div className="flex-1">
-          <label htmlFor="category" className="text-secondary-normal">
-            Categoria
-          </label>
-          <select
-            name="category"
-            id="category"
-            className="w-full p-2 rounded-lg bg-background-normal border border-secondary-light/10 text-secondary-normal focus:outline-secondary-light/20"
-            onChange={e => handleChange('category', e.target.value)}
+        <div className="flex-1 relative">
+          <SelectWithLabel
+            field="category"
+            label="Categoria"
+            handleChange={handleChange}
             value={product.category}
-          >
-            <option value="roupas">Roupas</option>
-            <option value="calçados">Calçados</option>
-            <option value="acessorios">Acessórios</option>
-          </select>
+            errors={errors}
+            options={[
+              { value: 'roupas', label: 'Roupas' },
+              { value: 'calcados', label: 'Calçados' },
+              { value: 'acessorios', label: 'Acessórios' },
+            ]}
+            handleOnBlur={handleOnBlur}
+          />
         </div>
 
-        <div className="flex-1">
-          <label htmlFor="typeProduct" className="text-secondary-normal">
-            Tipo
-          </label>
-          <input
-            name="typeProduct"
-            id="typeProduct"
-            className="w-full p-2 rounded-lg bg-background-normal border 
-            border-secondary-light/10 text-secondary-normal focus:outline-secondary-light/20"
+        <div className="flex-1 relative">
+          <InputWithLabel
+            field="typeProduct"
+            label="Tipo"
             placeholder="ex: camisa,blusa,calça"
-            onChange={e => handleChange('typeProduct', e.target.value)}
+            handleChange={handleChange}
             value={product.typeProduct}
+            handleOnBlur={handleOnBlur}
+            errors={errors}
           />
         </div>
       </div>
 
       <DropImage imgPreview={initialData ? initialData.productImage : null} />
 
-      <VariationsTable variants={variants} setVariants={setVariants} />
+      <VariationsTable
+        errors={errors}
+        setErrors={setErrors}
+        variants={variants}
+        setVariants={setVariants}
+        handleOnBlur={handleOnBlur}
+      />
 
-      <button className="cursor-pointer px-6 py-3 bg-[#4A7CF7] text-white rounded-lg hover:bg-[#3A66C7] transition-colors">
+      <button
+        disabled={errors.length > 0}
+        onClick={handleSubmit}
+        className={`cursor-pointer px-6 py-3 bg-primary-normal text-white rounded-lg hover:bg-primary-hover transition-colors disabled:cursor-not-allowed`}
+      >
         {initialData ? 'Salvar alterações' : 'Criar produto'}
       </button>
     </div>

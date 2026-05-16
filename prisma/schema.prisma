@@ -19,9 +19,9 @@ enum MovementType {
 }
 
 enum Category {
-  roupa
-  calcado
-  acessorio
+  roupas
+  calcados
+  acessorios
 }
 
 model User {

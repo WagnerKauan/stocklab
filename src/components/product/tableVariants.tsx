@@ -1,47 +1,78 @@
 'use client';
 import { ProductVariant } from '@/models/product/product-model';
-import { useState, useCallback } from 'react';
-
-type Variant =  Omit<ProductVariant, 'id'>;
-const empty = (): Variant => ({ size: '', color: '', stock: '', price: '' });
-
-
-function formatPrice(val: string) {
-  const n = parseFloat(val.replace(',', '.'));
-  return isNaN(n) ? val : n.toFixed(2).replace('.', ',');
-}
+import { formatCurrencyInput } from '@/utils/formatPrice';
+import { sanitizeNumberInput } from '@/utils/sanitizeNumberInput';
+import { useCallback, useState } from 'react';
+import type { ErrorInput } from './formProduct';
+import { v4 as uuidv4 } from 'uuid';
 
 type VariationsTableProps = {
-  variants: Variant[];
-  setVariants: React.Dispatch<React.SetStateAction<Variant[]>>;
+  variants: ProductVariant[];
+  errors: ErrorInput[];
+  setVariants: React.Dispatch<React.SetStateAction<ProductVariant[]>>;
+  handleOnBlur: (field: string, value: string, id?: string) => boolean;
+  setErrors: React.Dispatch<React.SetStateAction<ErrorInput[]>>;
 };
 
+type ErrorVariationCell = {
+  id: string;
+  field: string;
+};
+
+const empty = (): ProductVariant => ({
+  id: uuidv4(),
+  size: '',
+  color: '',
+  stock: 0,
+  priceInCents: 0,
+});
+
 export function VariationsTable({
+  errors,
   variants,
+  setErrors,
   setVariants,
+  handleOnBlur,
 }: VariationsTableProps) {
-  
   const update = useCallback(
-    (i: number, field: keyof Variant, value: string) => {
+    (i: number, field: keyof ProductVariant, value: string) => {
       setVariants(prev =>
         prev.map((v, idx) => (idx === i ? { ...v, [field]: value } : v)),
       );
     },
     [],
   );
-
-  const handleBlurPrice = useCallback((i: number, value: string) => {
-    const fmt = formatPrice(value);
-    setVariants(prev =>
-      prev.map((v, idx) => (idx === i ? { ...v, price: fmt } : v)),
-    );
-  }, []);
-
   const addRow = () => setVariants(prev => [...prev, empty()]);
+
   const removeRow = (i: number) =>
     setVariants(prev =>
       prev.length === 1 ? [empty()] : prev.filter((_, idx) => idx !== i),
     );
+
+  const [cellError, setCellError] = useState<ErrorVariationCell[]>([]);
+
+  const fildNames = ['size', 'color', 'stock', 'priceInCents'];
+
+  const errorsForm = errors.filter(err => fildNames.includes(err.field));
+
+  function handleOnblurVariant(idRow: string, field: string, value: string) {
+    const hasError = handleOnBlur(field, value, idRow);
+
+    if (hasError) {
+      const errorExists = cellError.find(
+        err => err.id === idRow && err.field === field,
+      );
+
+      if (errorExists) return;
+
+      setCellError(prev => [...prev, { id: idRow, field }]);
+      return;
+    }
+
+    setCellError(prev =>
+      prev.filter(err => err.id !== idRow || err.field !== field),
+    );
+  }
 
   return (
     <div className="flex flex-col gap-3 h-full overflow-hidden">
@@ -67,58 +98,99 @@ export function VariationsTable({
             </tr>
           </thead>
           <tbody>
-            {variants.map((v, i) => (
-              <tr
-                key={i}
-                className="border-b border-secondary-light/15 last:border-b-0 hover:bg-background-normal/50 transition-colors"
-              >
-                <td className="px-4 py-1.5">
-                  <input
-                    className="w-full py-1.5 text-sm bg-transparent border-none outline-none text-primary placeholder:text-tertiary"
-                    type="text"
-                    placeholder="Ex: M"
-                    value={v.size}
-                    onChange={e => update(i, 'size', e.target.value)}
-                  />
-                </td>
-                <td className="px-4 py-1.5">
-                  <input
-                    className="w-full py-1.5 text-sm bg-transparent border-none outline-none text-primary placeholder:text-tertiary"
-                    type="text"
-                    placeholder="Ex: Preto"
-                    value={v.color}
-                    onChange={e => update(i, 'color', e.target.value)}
-                  />
-                </td>
-                <td className="px-4 py-1.5">
-                  <input
-                    className="w-full py-1.5 text-sm bg-transparent border-none outline-none text-primary placeholder:text-tertiary"
-                    type="text"
-                    placeholder="estoque"
-                    value={v.stock}
-                    onChange={e => update(i, 'stock', e.target.value)}
-                  />
-                </td>
-                <td className="px-4 py-1.5 text-right">
-                  <input
-                    className="w-full py-1.5 text-sm bg-transparent border-none outline-none text-primary placeholder:text-tertiary text-right"
-                    type="text"
-                    placeholder="Preço"
-                    value={v.price}
-                    onChange={e => update(i, 'price', e.target.value)}
-                    onBlur={e => handleBlurPrice(i, e.target.value)}
-                  />
-                </td>
-                <td className="px-2 text-center">
-                  <button
-                    onClick={() => removeRow(i)}
-                    className="w-7 h-7 rounded-md text-tertiary hover:text-red-500 hover:bg-red-50 transition-colors text-sm"
-                  >
-                    ✕
-                  </button>
-                </td>
-              </tr>
-            ))}
+            {variants.map((v, i) => {
+              const cell = cellError.filter(err => err.id === v.id);
+
+                
+              return (
+                <tr
+                  key={i}
+                  className="border-b border-secondary-light/15 last:border-b-0 hover:bg-background-normal/50 transition-colors"
+                >
+                  <td className="px-4 py-1.5">
+                    <input
+                      className={`w-full py-1.5 text-sm bg-transparent border-none outline-none text-primary placeholder:text-tertiary
+                      ${cell.some(err => err.field === 'size') ? 'border-b border-b-error' : 'border-none'}  
+                    `}
+                      type="text"
+                      placeholder="Ex: M"
+                      value={v.size}
+                      onChange={e => update(i, 'size', e.target.value)}
+                      onBlur={e =>
+                        handleOnblurVariant(v.id, 'size', e.target.value)
+                      }
+                    />
+                  </td>
+                  <td className="px-4 py-1.5">
+                    <input
+                      className={`w-full  py-1.5 text-sm bg-transparent outline-none text-primary placeholder:text-tertiary
+                      ${cell.some(err => err.field === 'color') ? 'border-b border-b-error' : 'border-none'}
+                      `}
+                      type="text"
+                      placeholder="Ex: Preto"
+                      value={v.color}
+                      onChange={e => update(i, 'color', e.target.value)}
+                      onBlur={e =>
+                        handleOnblurVariant(v.id, 'color', e.target.value)
+                      }
+                    />
+                  </td>
+                  <td className="px-4 py-1.5">
+                    <input
+                      className={`w-full py-1.5 text-sm bg-transparent outline-none text-primary placeholder:text-tertiary
+                      ${cell.some(err => err.field === 'stock') ? 'border-b border-b-error' : 'border-none'}  
+                    `}
+                      type="text"
+                      placeholder="estoque"
+                      value={v.stock}
+                      onChange={e =>
+                        update(
+                          i,
+                          'stock',
+                          sanitizeNumberInput(e.target.value, 4),
+                        )
+                      }
+                      onBlur={e =>
+                        handleOnblurVariant(v.id, 'stock', e.target.value)
+                      }
+                    />
+                  </td>
+                  <td className="px-4 py-1.5 text-right">
+                    <input
+                      className={`w-full py-1.5 text-sm bg-transparent outline-none text-primary placeholder:text-tertiary text-right
+                      ${cell.some(err => err.field === 'priceInCents') ? 'border-b border-b-error' : 'border-none' } 
+                    `}
+                      type="text"
+                      placeholder="Preço"
+                      value={v.priceInCents}
+                      onChange={e => {
+                        const formatted = formatCurrencyInput(e.target.value);
+
+                        update(i, 'priceInCents', formatted.value);
+                      }}
+                      onBlur={e =>
+                        handleOnblurVariant(
+                          v.id,
+                          'priceInCents',
+                          e.target.value,
+                        )
+                      } 
+                    />
+                  </td>
+                  <td className="px-2 text-center">
+                    <button
+                      onClick={() => {
+                        removeRow(i),
+                        setErrors(prev => prev.filter(err => err.id !== v.id))
+                      }}
+                      className="w-7 h-7 rounded-md text-tertiary hover:text-red-500 hover:bg-red-50 transition-colors text-sm"
+                    >
+                      ✕
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
@@ -179,9 +251,8 @@ export function VariationsTable({
                   className="w-full text-sm bg-transparent border-none outline-none text-primary placeholder:text-tertiary"
                   type="text"
                   placeholder="0,00"
-                  value={v.price}
-                  onChange={e => update(i, 'price', e.target.value)}
-                  onBlur={e => handleBlurPrice(i, e.target.value)}
+                  value={v.priceInCents}
+                  onChange={e => update(i, 'priceInCents', e.target.value)}
                 />
               </div>
             </div>
@@ -189,7 +260,13 @@ export function VariationsTable({
         ))}
       </div>
 
-      <div className="flex justify-end">
+      <div
+        className={`flex items-center ${errorsForm.length > 0 ? 'justify-between' : 'justify-end'}`}
+      >
+        {errorsForm.length > 0 && (
+          <span className="text-error text-sm">{errorsForm[0].message}</span>
+        )}
+
         <button
           onClick={addRow}
           className="flex items-center cursor-pointer gap-1.5 px-5 py-2.5 text-[13px] font-medium bg-[#1C2A4A] text-white rounded-lg hover:opacity-90 transition-opacity"

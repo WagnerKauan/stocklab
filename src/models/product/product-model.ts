@@ -11,8 +11,8 @@ export type ProductVariant = {
   id: string;
   size: string;
   color: string;
-  stock: string;
-  price: string;
+  stock: number;
+  priceInCents: number;
   sku?: string;
 };
 

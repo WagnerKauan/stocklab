@@ -30,8 +30,8 @@ export default async function ProductDetailPage({
 
   const [minPrice, maxPrice] = product.variants.reduce(
     ([min, max], variant) => [
-      Math.min(min, variant.price),
-      Math.max(max, variant.price),
+      Math.min(min, variant.priceInCents),
+      Math.max(max, variant.priceInCents),
     ],
     [Infinity, -Infinity],
   );
@@ -77,10 +77,9 @@ export default async function ProductDetailPage({
           paragrafo="Confira todas informações do produto para ficar alinhado"
           typeTitle="info"
         />
-
         <Link
           href={`/products/${id}/edit`}
-          className="flex items-center cursor-pointer gap-1.5 px-5 py-2.5 text-[13px] font-medium 
+          className="flex items-center cursor-pointer gap-1.5 px-8 py-2
           bg-primary-normal text-white rounded-lg hover:opacity-90 transition-opacity"
         >
           <FiEdit2 size={20} color="#FFF" />
@@ -174,7 +173,7 @@ export default async function ProductDetailPage({
                       </td>
 
                       <td className="text-center py-1.5">
-                        <span>R$ {variant.price.toFixed(2)}</span>
+                        <span>R$ {variant.priceInCents.toFixed(2)}</span>
                       </td>
                     </tr>
                   );
