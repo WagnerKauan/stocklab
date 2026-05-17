@@ -1,7 +1,8 @@
-export function formatCurrencyInput(value: string) {
-  if(!value) return { value: '', formatted: '' };
+export function formatCurrencyInput(value: string | number) {
 
-  console.log(typeof value);
+  if(typeof value === 'number') value = value.toString();
+
+  if(!value) return { value: '', formatted: '' };
   
   const numbers = value.replace(/\D/g, '').slice(0, 6);
 

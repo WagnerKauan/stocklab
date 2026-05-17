@@ -12,7 +12,7 @@ import { createProduct } from '@/actions/product/create-product';
 import { v4 as uuidv4 } from 'uuid';
 
 /*
-  PRECISO TRABALHAR NA FUNÇÃO HANDLEONBLUR VERIFICAR SE O ERRO JÁ EXISTE E COLOCAR ID COMO PARAMETRO OPCIONAL NO HANDLEONBLUR
+  PRECISO TRABALHAR NA FUNÇÃO handleSubmit VERIFICAR TODOS OS CAMPOS COM ZOD E PEGAR TODOS OS ERROS COLOCAR DENTRO DE UM ARRAY E PASSAR PARA O ESTADO
 */
 
 type FormProductProps = {
@@ -53,6 +53,7 @@ export function FormProduct({ initialData }: FormProductProps) {
     value: string | number,
     id?: string,
   ): boolean {
+    console.log(value);
     if (
       (!isNaN(Number(value)) && field === 'priceInCents') ||
       field === 'stock'
@@ -91,14 +92,35 @@ export function FormProduct({ initialData }: FormProductProps) {
       variants,
     };
 
-    const isProductValid = productSchema.safeParse(product);
-    const isVariantsValid = variants.every(variant =>
-      variantSchema.safeParse(variant),
-    );
+    const errorsProduct = productSchema
+      .safeParse(product)
+      .error?.issues.reduce<ErrorInput[]>((errs, issue) => {
+        errs.push({
+          message: issue.message,
+          field: issue.path[0].toString(),
+        });
+        return errs;
+      }, []) || [];
 
-    if (!isProductValid.success || !isVariantsValid) {
-      console.log('Dados inválidos');
-      return;
+    const errorsVariants = variants.reduce<ErrorInput[]>((errs, variant) => {
+      const variantValid = variantSchema.safeParse(variant);
+      if (!variantValid.success) {
+
+        variantValid.error.issues.forEach(issue => {
+          errs.push({
+            id: variant.id,
+            message: issue.message,
+            field: issue.path[0].toString(),
+          });
+        });
+      }
+
+      return errs;
+    }, []);
+
+    if(errorsProduct && errorsProduct.length > 0 || errorsVariants.length > 0) {
+      setErrors([...errorsProduct, ...errorsVariants]);
+      return
     }
 
     const response = await createProduct(data);

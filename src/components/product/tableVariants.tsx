@@ -2,7 +2,7 @@
 import { ProductVariant } from '@/models/product/product-model';
 import { formatCurrencyInput } from '@/utils/formatPrice';
 import { sanitizeNumberInput } from '@/utils/sanitizeNumberInput';
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 import type { ErrorInput } from './formProduct';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -12,11 +12,6 @@ type VariationsTableProps = {
   setVariants: React.Dispatch<React.SetStateAction<ProductVariant[]>>;
   handleOnBlur: (field: string, value: string, id?: string) => boolean;
   setErrors: React.Dispatch<React.SetStateAction<ErrorInput[]>>;
-};
-
-type ErrorVariationCell = {
-  id: string;
-  field: string;
 };
 
 const empty = (): ProductVariant => ({
@@ -49,29 +44,11 @@ export function VariationsTable({
       prev.length === 1 ? [empty()] : prev.filter((_, idx) => idx !== i),
     );
 
-  const [cellError, setCellError] = useState<ErrorVariationCell[]>([]);
-
   const fildNames = ['size', 'color', 'stock', 'priceInCents'];
-
   const errorsForm = errors.filter(err => fildNames.includes(err.field));
 
   function handleOnblurVariant(idRow: string, field: string, value: string) {
-    const hasError = handleOnBlur(field, value, idRow);
-
-    if (hasError) {
-      const errorExists = cellError.find(
-        err => err.id === idRow && err.field === field,
-      );
-
-      if (errorExists) return;
-
-      setCellError(prev => [...prev, { id: idRow, field }]);
-      return;
-    }
-
-    setCellError(prev =>
-      prev.filter(err => err.id !== idRow || err.field !== field),
-    );
+    handleOnBlur(field, value, idRow);
   }
 
   return (
@@ -99,7 +76,7 @@ export function VariationsTable({
           </thead>
           <tbody>
             {variants.map((v, i) => {
-              const cell = cellError.filter(err => err.id === v.id);
+              const cell = errors.filter(err => err.id === v.id); 
 
                 
               return (
@@ -142,8 +119,8 @@ export function VariationsTable({
                     `}
                       type="text"
                       placeholder="estoque"
-                      value={v.stock}
-                      onChange={e =>
+                      value={v.stock || ''}
+                      onChange={e => 
                         update(
                           i,
                           'stock',
@@ -162,17 +139,17 @@ export function VariationsTable({
                     `}
                       type="text"
                       placeholder="Preço"
-                      value={v.priceInCents}
+                      value={v.priceInCents || ''}
                       onChange={e => {
                         const formatted = formatCurrencyInput(e.target.value);
 
-                        update(i, 'priceInCents', formatted.value);
+                        update(i, 'priceInCents', formatted.formatted);
                       }}
                       onBlur={e =>
                         handleOnblurVariant(
                           v.id,
                           'priceInCents',
-                          e.target.value,
+                          formatCurrencyInput(e.target.value).value,
                         )
                       } 
                     />
