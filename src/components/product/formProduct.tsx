@@ -8,12 +8,9 @@ import { productSchema } from '@/schemas/product/product.schema';
 import { InputWithLabel } from '../ui/input';
 import { SelectWithLabel } from '../ui/select';
 import { variantSchema } from '@/schemas/product/variant.schema';
-import { createProduct } from '@/actions/product/create-product';
+import { actionCreateProduct } from '@/actions/product/action-create-product';
 import { v4 as uuidv4 } from 'uuid';
-
-/*
-  PRECISO TRABALHAR NA FUNÇÃO handleSubmit VERIFICAR TODOS OS CAMPOS COM ZOD E PEGAR TODOS OS ERROS COLOCAR DENTRO DE UM ARRAY E PASSAR PARA O ESTADO
-*/
+import { sanitizeVariant } from '@/utils/sanitizeVariant';
 
 type FormProductProps = {
   initialData?: ProductModel;
@@ -28,13 +25,13 @@ export type ErrorInput = {
 export function FormProduct({ initialData }: FormProductProps) {
   const [variants, setVariants] = useState(
     initialData?.variants || [
-      { id: uuidv4(), size: '', color: '', stock: 0, priceInCents: 0 },
+      { id: uuidv4(), size: '', color: '', stock: 0, priceInCents: 0, sku: '' },
     ],
   );
 
   const [product, setProduct] = useState({
     name: initialData?.name || '',
-    category: initialData?.category || '',
+    category: initialData?.category || 'roupas',
     typeProduct: initialData?.typeProduct || '',
     productImage: initialData?.productImage || '',
   });
@@ -53,7 +50,6 @@ export function FormProduct({ initialData }: FormProductProps) {
     value: string | number,
     id?: string,
   ): boolean {
-    console.log(value);
     if (
       (!isNaN(Number(value)) && field === 'priceInCents') ||
       field === 'stock'
@@ -92,23 +88,26 @@ export function FormProduct({ initialData }: FormProductProps) {
       variants,
     };
 
-    const errorsProduct = productSchema
-      .safeParse(product)
-      .error?.issues.reduce<ErrorInput[]>((errs, issue) => {
-        errs.push({
-          message: issue.message,
-          field: issue.path[0].toString(),
-        });
-        return errs;
-      }, []) || [];
+    const errorsProduct =
+      productSchema
+        .safeParse(product)
+        .error?.issues.reduce<ErrorInput[]>((errs, issue) => {
+          errs.push({
+            message: issue.message,
+            field: issue.path[0].toString(),
+          });
+          return errs;
+        }, []) || [];
 
     const errorsVariants = variants.reduce<ErrorInput[]>((errs, variant) => {
-      const variantValid = variantSchema.safeParse(variant);
-      if (!variantValid.success) {
+      
+      const sanitizedVariant = sanitizeVariant(variant);
 
+      const variantValid = variantSchema.safeParse(sanitizedVariant);
+      if (!variantValid.success) {
         variantValid.error.issues.forEach(issue => {
           errs.push({
-            id: variant.id,
+            id: sanitizedVariant.id,
             message: issue.message,
             field: issue.path[0].toString(),
           });
@@ -118,13 +117,30 @@ export function FormProduct({ initialData }: FormProductProps) {
       return errs;
     }, []);
 
-    if(errorsProduct && errorsProduct.length > 0 || errorsVariants.length > 0) {
+    if (
+      (errorsProduct && errorsProduct.length > 0) ||
+      errorsVariants.length > 0
+    ) {
       setErrors([...errorsProduct, ...errorsVariants]);
-      return
+      return;
     }
 
-    const response = await createProduct(data);
+    const response = await actionCreateProduct(data);
+
+    if(response.code === 500) {
+      alert('Erro desconhecido ao criar o produto')
+      return;
+    }
+
+    if(response.code === 400) {
+      setErrors(prev => [...prev, ...response.errors])
+      return;
+    }
+
+    alert('Produto criado')
   }
+
+  console.log(errors)
 
   return (
     <div className="max-w-187.5 w-full mx-auto flex flex-col h-full  gap-6">

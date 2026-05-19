@@ -1,8 +1,11 @@
 export function sanitizeNumberInput(
-  value: string,
+  value: string | number,
   maxLength: number
 ) {
-  return value
-    .replace(/\D/g, '')
-    .slice(0, maxLength)
+
+  if(typeof value === 'number') value = value.toString();
+
+  const numericValue = Number(value.replace(/\D/g, '').slice(0, maxLength));
+
+  return numericValue
 }

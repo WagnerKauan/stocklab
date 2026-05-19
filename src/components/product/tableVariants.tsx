@@ -1,7 +1,6 @@
 'use client';
 import { ProductVariant } from '@/models/product/product-model';
 import { formatCurrencyInput } from '@/utils/formatPrice';
-import { sanitizeNumberInput } from '@/utils/sanitizeNumberInput';
 import { useCallback } from 'react';
 import type { ErrorInput } from './formProduct';
 import { v4 as uuidv4 } from 'uuid';
@@ -20,6 +19,7 @@ const empty = (): ProductVariant => ({
   color: '',
   stock: 0,
   priceInCents: 0,
+  sku: '',
 });
 
 export function VariationsTable({
@@ -91,7 +91,7 @@ export function VariationsTable({
                     `}
                       type="text"
                       placeholder="Ex: M"
-                      value={v.size}
+                      value={v.size || ''}
                       onChange={e => update(i, 'size', e.target.value)}
                       onBlur={e =>
                         handleOnblurVariant(v.id, 'size', e.target.value)
@@ -105,7 +105,7 @@ export function VariationsTable({
                       `}
                       type="text"
                       placeholder="Ex: Preto"
-                      value={v.color}
+                      value={v.color || ''}
                       onChange={e => update(i, 'color', e.target.value)}
                       onBlur={e =>
                         handleOnblurVariant(v.id, 'color', e.target.value)
@@ -124,7 +124,7 @@ export function VariationsTable({
                         update(
                           i,
                           'stock',
-                          sanitizeNumberInput(e.target.value, 4),
+                          e.target.value.replace(/[^0-9]/g, ''),
                         )
                       }
                       onBlur={e =>
@@ -139,7 +139,7 @@ export function VariationsTable({
                     `}
                       type="text"
                       placeholder="Preço"
-                      value={v.priceInCents || ''}
+                      value={formatCurrencyInput(v.priceInCents).formatted}
                       onChange={e => {
                         const formatted = formatCurrencyInput(e.target.value);
 
@@ -173,7 +173,7 @@ export function VariationsTable({
       </div>
 
       {/* Mobile */}
-      <div className="md:hidden border border-secondary-light/20 rounded-xl overflow-hidden">
+      {/* <div className="md:hidden border border-secondary-light/20 rounded-xl overflow-hidden">
         <div className="bg-[#4A7CF7] flex px-4 py-3">
           <span className="flex-1 text-[13px] font-medium text-white">
             Tamanho / Cor
@@ -235,7 +235,7 @@ export function VariationsTable({
             </div>
           </div>
         ))}
-      </div>
+      </div> */}
 
       <div
         className={`flex items-center ${errorsForm.length > 0 ? 'justify-between' : 'justify-end'}`}

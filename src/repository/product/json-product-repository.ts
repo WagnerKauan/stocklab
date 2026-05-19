@@ -30,4 +30,8 @@ export class JsonProductRepository implements ProductRepository {
     const product = products.find(p => p.id === id) || null;
     return product;
   }
+
+  create(data: ProductModel): Promise<boolean> {
+    throw new Error('Method not implemented.');
+  }
 }

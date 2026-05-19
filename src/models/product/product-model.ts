@@ -3,20 +3,20 @@ export type ProductModel = {
   name: string;
   category: ProductCategory;
   typeProduct: string;
-  productImage: string;
+  productImage: string | null;
   variants: ProductVariant[];
 };
 
 export type ProductVariant = {
   id: string;
-  size: string;
-  color: string;
+  size: string | null;
+  color: string | null;
   stock: number;
   priceInCents: number;
-  sku?: string;
+  sku: string | null;
 };
 
-export type ProductCategory = 'roupa' | 'calcado' | 'acessorio';
+export type ProductCategory = 'roupas' | 'calcados' | 'acessorios';
 
 export type teste =
   | 'jaqueta'
@@ -30,3 +30,6 @@ export type teste =
   | 'bermuda'
   | 'tênis'
   | 'acessório';
+
+
+export type ProductData = Omit<ProductModel, 'id'>

@@ -52,7 +52,7 @@ model Product {
   id String @id @default(cuid())
   userId String
   name String
-  image String?
+  productImage String?
   typeProduct String
   category Category
 
