@@ -10,7 +10,8 @@ import { SelectWithLabel } from '../ui/select';
 import { variantSchema } from '@/schemas/product/variant.schema';
 import { actionCreateProduct } from '@/actions/product/action-create-product';
 import { v4 as uuidv4 } from 'uuid';
-import { sanitizeVariant } from '@/utils/sanitizeVariant';
+import { validateProduct } from '@/validation/product';
+import { actionUpdateProduct } from '@/actions/product/action-update-product';
 
 type FormProductProps = {
   initialData?: ProductModel;
@@ -33,7 +34,7 @@ export function FormProduct({ initialData }: FormProductProps) {
     name: initialData?.name || '',
     category: initialData?.category || 'roupas',
     typeProduct: initialData?.typeProduct || '',
-    productImage: initialData?.productImage || '',
+    productImage: initialData?.productImage || '/product/jaqueta.jpg',
   });
 
   const [errors, setErrors] = useState<ErrorInput[]>([]);
@@ -82,65 +83,83 @@ export function FormProduct({ initialData }: FormProductProps) {
     return false;
   }
 
+  function resetState() {
+    setProduct({
+      name: '',
+      category: 'roupas',
+      typeProduct: '',
+      productImage: '',
+    });
+    setVariants([
+      { id: uuidv4(), size: '', color: '', stock: 0, priceInCents: 0, sku: '' },
+    ]);
+    setErrors([]);
+  }
+
   async function handleSubmit() {
     const data = {
       ...product,
       variants,
     };
 
-    const errorsProduct =
-      productSchema
-        .safeParse(product)
-        .error?.issues.reduce<ErrorInput[]>((errs, issue) => {
-          errs.push({
-            message: issue.message,
-            field: issue.path[0].toString(),
-          });
-          return errs;
-        }, []) || [];
+    const { errorsProduct, errorsVariants } = validateProduct(data);
 
-    const errorsVariants = variants.reduce<ErrorInput[]>((errs, variant) => {
-      
-      const sanitizedVariant = sanitizeVariant(variant);
-
-      const variantValid = variantSchema.safeParse(sanitizedVariant);
-      if (!variantValid.success) {
-        variantValid.error.issues.forEach(issue => {
-          errs.push({
-            id: sanitizedVariant.id,
-            message: issue.message,
-            field: issue.path[0].toString(),
-          });
-        });
-      }
-
-      return errs;
-    }, []);
-
-    if (
-      (errorsProduct && errorsProduct.length > 0) ||
-      errorsVariants.length > 0
-    ) {
+    if (errorsProduct.length > 0 || errorsVariants.length > 0) {
       setErrors([...errorsProduct, ...errorsVariants]);
+      return;
+    }
+
+    if (initialData) {
+      await handleEditProduct();
       return;
     }
 
     const response = await actionCreateProduct(data);
 
-    if(response.code === 500) {
-      alert('Erro desconhecido ao criar o produto')
+    if (response.code === 500) {
+      alert('Erro desconhecido ao criar o produto');
       return;
     }
 
-    if(response.code === 400) {
-      setErrors(prev => [...prev, ...response.errors])
+    if (response.code === 400) {
+      setErrors(prev => [...prev, ...response.errors]);
       return;
     }
 
-    alert('Produto criado')
+    alert('Produto criado');
+
+    resetState();
   }
 
-  console.log(errors)
+  async function handleEditProduct() {
+    if (!initialData) {
+      alert('Erro ao editar o produto');
+      return;
+    }
+
+    const data = {
+      ...product,
+      id: initialData.id,
+      variants,
+    };
+
+    const response = await actionUpdateProduct(data);
+
+    switch (response.code) {
+      case 500:
+        alert('Erro desconhecido ao editar o produto');
+        return;
+      case 400:
+        setErrors(prev => [...prev, ...response.errors]);
+        return;
+      case 404:
+        alert('Produto nao encontrado');
+        return;
+    }
+
+    alert('Produto editado');
+    resetState();
+  }
 
   return (
     <div className="max-w-187.5 w-full mx-auto flex flex-col h-full  gap-6">

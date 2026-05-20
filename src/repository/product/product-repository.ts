@@ -1,8 +1,13 @@
-import { ProductModel } from '@/models/product/product-model';
+import { SyncVariants, ProductModel } from '@/models/product/product-model';
+import { ProductData } from '@/models/product/product-model';
 
 export interface ProductRepository {
   findAll(): Promise<ProductModel[]>;
   findById(id: string): Promise<ProductModel | null>;
 
-  create(product: ProductModel & { userId: string }): Promise<boolean>
+  create(product: ProductData & { userId: string }): Promise<boolean>;
+
+  update(product: ProductModel): Promise<boolean>;
+
+  syncVariants(variants: SyncVariants): Promise<boolean>;
 }

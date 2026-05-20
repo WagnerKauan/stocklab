@@ -90,7 +90,7 @@ export default async function ProductDetailPage({
       <div className="flex gap-8 mt-8">
         <div className="w-100 h-125 rounded-2xl overflow-hidden shadow-card ">
           <Image
-            src={product.productImage}
+            src={product.productImage || '/product/jaqueta.jpg'}
             alt={product.name}
             className="object-cover h-full w-full"
             priority
@@ -173,7 +173,7 @@ export default async function ProductDetailPage({
                       </td>
 
                       <td className="text-center py-1.5">
-                        <span>R$ {variant.priceInCents.toFixed(2)}</span>
+                        <span>R$ {variant.priceInCents}</span>
                       </td>
                     </tr>
                   );

@@ -1,7 +1,8 @@
-import { ProductModel } from '@/models/product/product-model';
+import { ProductModel, SyncVariants } from '@/models/product/product-model';
 import { readFile } from 'fs/promises';
 import { resolve } from 'path';
 import { ProductRepository } from './product-repository';
+import { ProductData } from '@/models/product/product-model';
 
 const ROOT_DIR = process.cwd();
 const JSON_PRODUCTS_PATH = resolve(
@@ -31,7 +32,15 @@ export class JsonProductRepository implements ProductRepository {
     return product;
   }
 
-  create(data: ProductModel): Promise<boolean> {
+  create(data: ProductData): Promise<boolean> {
+    throw new Error('Method not implemented.');
+  }
+
+  syncVariants(variants: SyncVariants): Promise<boolean> {
+    throw new Error('Method not implemented.');
+  }
+
+  update(product: ProductModel): Promise<boolean> {
     throw new Error('Method not implemented.');
   }
 }

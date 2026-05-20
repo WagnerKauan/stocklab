@@ -1,4 +1,4 @@
-import { ProductModel } from '@/models/product/product-model';
+import { SyncVariants, ProductModel } from '@/models/product/product-model';
 import { ProductRepository } from './product-repository';
 import { prisma } from '@/lib/prisma';
 
@@ -55,6 +55,82 @@ export class SqliteProductRepository implements ProductRepository {
       });
 
       return !!result;
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
+  }
+
+  async update(product: ProductModel): Promise<boolean> {
+    const { variants, id, ...productData } = product;
+
+    try {
+      const result = await prisma.product.update({
+        where: {
+          id: id,
+        },
+        data: {
+          ...productData,
+        },
+      });
+      return !!result;
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
+  }
+
+  async syncVariants(variants: SyncVariants): Promise<boolean> {
+    const { productId, toCreate, toUpdate, toDelete } = variants;
+
+    try {
+      const result = await prisma.$transaction(async tx => {
+        if (toCreate.length > 0) {
+          await tx.variant.createMany({
+            data: toCreate.map(v => ({
+              priceInCents: v.priceInCents,
+              stock: v.stock,
+              color: v.color,
+              size: v.size,
+              sku: v.sku,
+              productId: productId,
+            })),
+          });
+        }
+
+        if (toUpdate.length > 0) {
+          await Promise.all(
+            toUpdate.map(v =>
+              tx.variant.update({
+                where: {
+                  id: v.id,
+                  productId: productId,
+                },
+                data: {
+                  priceInCents: v.priceInCents,
+                  stock: v.stock,
+                  color: v.color,
+                  size: v.size,
+                  sku: v.sku,
+                },
+              }),
+            ),
+          );
+        }
+
+        if (toDelete.length > 0) {
+          await tx.variant.deleteMany({
+            where: {
+              id: {
+                in: toDelete.map(v => v.id),
+              },
+
+              productId: productId,
+            },
+          });
+        }
+      });
+      return true;
     } catch (error) {
       console.error(error);
       return false;

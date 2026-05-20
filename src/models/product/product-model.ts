@@ -18,18 +18,11 @@ export type ProductVariant = {
 
 export type ProductCategory = 'roupas' | 'calcados' | 'acessorios';
 
-export type teste =
-  | 'jaqueta'
-  | 'saia'
-  | 'blusa'
-  | 'calça'
-  | 'vestido'
-  | 'blazer'
-  | 'short'
-  | 'camisa'
-  | 'bermuda'
-  | 'tênis'
-  | 'acessório';
+export type ProductData = Omit<ProductModel, 'id'>;
 
-
-export type ProductData = Omit<ProductModel, 'id'>
+export type SyncVariants = {
+  productId: string;
+  toCreate: ProductVariant[];
+  toUpdate: ProductVariant[];
+  toDelete: ProductVariant[];
+};

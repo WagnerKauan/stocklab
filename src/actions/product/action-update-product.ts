@@ -1,16 +1,14 @@
-import { findProductByIdChached } from "@/lib/queries/product";
+"use server";
+
+import { findProductByIdChached, syncVariants, updateProduct } from "@/lib/queries/product";
 import { ProductModel } from "@/models/product/product-model";
+import { validateProduct } from "@/validation/product";
+
 
 /*
-  PRECISO TRABALHAR NA LÓGICA DE CREATE,UPDATE E DELETE COMO IDENTIFICAR AS VARIANTS QUE SÃO DE EDIÇÃO, CRIAÇÃO OU DELETAR
-
-  1- preciso pegar todas as variações que já existem daquele produto no banco de dados
-  2- comparar as variações que veio do front com as que veio do banco de dados
-  3- se houver alguma variante que não exista no banco de dados preciso criar ela
-  4- se houver alguma variante que exista no banco de dados preciso atualizar ela
-  5- se houver alguma variante que nao exista no front mas exista no banco de dados preciso deletar ela
+  preciso futuramente quando o produto for buscado no banco de dados preciso confirmar com o userId se aquele produto é do usuario logado
+  preciso colocar dentro do $transaction o updateProduct e o syncVariants
 */
-
 
 export async function actionUpdateProduct(data: ProductModel) {
 
@@ -18,12 +16,22 @@ export async function actionUpdateProduct(data: ProductModel) {
   const { variants, ...productData } = data;
 
 
+  const { errorsProduct, errorsVariants } = validateProduct({ ...productData, variants });
+
+  if(errorsProduct.length > 0 || errorsVariants.length > 0) {
+    return {
+      status: false,
+      errors: [...errorsProduct, ...errorsVariants],
+      code: 400,
+    }
+  }
+
   const productDB = await findProductByIdChached(productData.id);
 
   if(!productDB) {
     return {
       status: false,
-      errors: ['Produto nao encontrado'],
+      errors: [],
       code: 404
     }
   }
@@ -38,4 +46,20 @@ export async function actionUpdateProduct(data: ProductModel) {
 
   //Percorro as variações do banco de dados e verifico se elas existem no front se não existir eu deleto
   const variantsToDelete = variantsDB.filter(variantDB => !variants.some(variant => variant.id === variantDB.id))
+
+  const variantsToSync = {
+    productId: productDB.id,
+    toCreate: variantsToCreate,
+    toUpdate: variantsToUpdate,
+    toDelete: variantsToDelete,
+  }
+
+  const resultUpdateProduct = await updateProduct({ variants, ...productData });
+  const resultSyncVariants = await syncVariants(variantsToSync);
+
+  return {
+    status: resultUpdateProduct && resultSyncVariants,
+    errors: [],
+    code: resultUpdateProduct && resultSyncVariants ? 200 : 500,
+  }
 }
