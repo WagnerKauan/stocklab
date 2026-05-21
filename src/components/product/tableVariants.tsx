@@ -4,12 +4,13 @@ import { formatCurrencyInput } from '@/utils/formatPrice';
 import { useCallback } from 'react';
 import type { ErrorInput } from './formProduct';
 import { v4 as uuidv4 } from 'uuid';
+import { sanitizeNumberInput } from '@/utils/sanitizeNumberInput';
 
 type VariationsTableProps = {
   variants: ProductVariant[];
   errors: ErrorInput[];
   setVariants: React.Dispatch<React.SetStateAction<ProductVariant[]>>;
-  handleOnBlur: (field: string, value: string, id?: string) => boolean;
+  handleOnBlur: (field: string, value: string | number, id?: string) => boolean;
   setErrors: React.Dispatch<React.SetStateAction<ErrorInput[]>>;
 };
 
@@ -29,14 +30,21 @@ export function VariationsTable({
   setVariants,
   handleOnBlur,
 }: VariationsTableProps) {
+  
   const update = useCallback(
-    (i: number, field: keyof ProductVariant, value: string) => {
+    (i: number, field: keyof ProductVariant, value: string | number) => {
+
+      //Aqui eu transforma o valor para número
+      if(field === 'priceInCents' || field === 'stock') value = sanitizeNumberInput(value, 6);
+
+
       setVariants(prev =>
         prev.map((v, idx) => (idx === i ? { ...v, [field]: value } : v)),
       );
     },
     [],
   );
+
   const addRow = () => setVariants(prev => [...prev, empty()]);
 
   const removeRow = (i: number) =>
@@ -47,9 +55,12 @@ export function VariationsTable({
   const fildNames = ['size', 'color', 'stock', 'priceInCents'];
   const errorsForm = errors.filter(err => fildNames.includes(err.field));
 
-  function handleOnblurVariant(idRow: string, field: string, value: string) {
+  function handleOnblurVariant(idRow: string, field: string, value: string | number) {
+     if(field === 'priceInCents' || field === 'stock') value = sanitizeNumberInput(value);
     handleOnBlur(field, value, idRow);
   }
+
+  
 
   return (
     <div className="flex flex-col gap-3 h-full overflow-hidden">
@@ -141,15 +152,13 @@ export function VariationsTable({
                       placeholder="Preço"
                       value={formatCurrencyInput(v.priceInCents).formatted}
                       onChange={e => {
-                        const formatted = formatCurrencyInput(e.target.value);
-
-                        update(i, 'priceInCents', formatted.formatted);
+                        update(i, 'priceInCents', e.target.value);
                       }}
                       onBlur={e =>
                         handleOnblurVariant(
                           v.id,
                           'priceInCents',
-                          formatCurrencyInput(e.target.value).value,
+                          e.target.value,
                         )
                       } 
                     />

@@ -9,6 +9,9 @@ import { VariantIcon } from '@/components/icons/variantIcon';
 import { StockIcon } from '@/components/icons/stockIcon';
 import { MINIMUM_STOCK_VARIANTS } from '@/settings/variablesGlobal';
 import Link from 'next/link';
+import { formatCurrencyInput } from '@/utils/formatPrice';
+import { findProductByIdChached } from '@/lib/queries/product';
+import { sortVariants } from '@/utils/sizeOrder';
 
 export default async function ProductDetailPage({
   params,
@@ -17,11 +20,13 @@ export default async function ProductDetailPage({
 }) {
   const { id } = await params;
 
-  const product = await productRepository.findById(id);
+  const product = await findProductByIdChached(id);
 
   if (!product) {
     return <CardMain>Product not found</CardMain>;
   }
+
+  product.variants = sortVariants(product.variants);
 
   const productStock = product.variants.reduce(
     (total, variant) => total + variant.stock,
@@ -56,7 +61,7 @@ export default async function ProductDetailPage({
     },
     {
       tag: 'Preço',
-      value: `R$${minPrice} - ${maxPrice}`,
+      value: `${formatCurrencyInput(minPrice).formatted} - ${formatCurrencyInput(maxPrice).formatted}`,
       icon: <FiDollarSign size={20} color="#FFF" />,
       bgColor: 'bg-success',
     },
@@ -173,7 +178,7 @@ export default async function ProductDetailPage({
                       </td>
 
                       <td className="text-center py-1.5">
-                        <span>R$ {variant.priceInCents}</span>
+                        <span>{formatCurrencyInput(variant.priceInCents).formatted}</span>
                       </td>
                     </tr>
                   );

@@ -39,6 +39,8 @@ export function FormProduct({ initialData }: FormProductProps) {
 
   const [errors, setErrors] = useState<ErrorInput[]>([]);
 
+ 
+
   const handleChange = (field: string, value: string) => {
     setProduct(prev => ({
       ...prev,
@@ -51,12 +53,6 @@ export function FormProduct({ initialData }: FormProductProps) {
     value: string | number,
     id?: string,
   ): boolean {
-    if (
-      (!isNaN(Number(value)) && field === 'priceInCents') ||
-      field === 'stock'
-    ) {
-      value = Number(value);
-    }
 
     const fieldSchema =
       productSchema.shape[field as keyof typeof productSchema.shape] ||
@@ -109,6 +105,7 @@ export function FormProduct({ initialData }: FormProductProps) {
       return;
     }
 
+    
     if (initialData) {
       await handleEditProduct();
       return;
@@ -216,8 +213,10 @@ export function FormProduct({ initialData }: FormProductProps) {
         </div>
       </div>
 
-      <DropImage imgPreview={initialData ? initialData.productImage : null} />
-
+      <DropImage imgPreview={initialData ? initialData.productImage : null}  
+        setUrlImage={handleChange}
+      />
+            
       <VariationsTable
         errors={errors}
         setErrors={setErrors}
