@@ -30,8 +30,6 @@ export const ourFileRouter = {
       maxFileCount: 1,
     },
   }).onUploadComplete(async ({ file }) => {
-    console.log('upload feito', file.ufsUrl);
-
     return {
       productImage: file.ufsUrl,
     };

@@ -89,7 +89,7 @@ export function ListProducts({ products }: ListProductsProps) {
                   <div className="flex items-center gap-3 min-w-0">
                     <div className="w-10 h-10 rounded-full overflow-hidden shrink-0">
                       <Image
-                        src={product.productImage}
+                        src={product.productImage || '/product/placeHolderProduct.png'}
                         alt={product.name}
                         width={40}
                         height={40}
@@ -140,7 +140,7 @@ export function ListProducts({ products }: ListProductsProps) {
                     <div className="flex items-center gap-3 min-w-0">
                       <div className="w-10 h-10 rounded-full overflow-hidden shrink-0">
                         <Image
-                          src={product.productImage}
+                          src={product.productImage || '/product/placeHolderProduct.png'}
                           alt={product.name}
                           width={40}
                           height={40}

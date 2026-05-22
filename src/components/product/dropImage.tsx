@@ -1,12 +1,11 @@
 'use client';
 
-import { useUploadThing } from '@/lib/uploadthing';
 import React, { useCallback, useEffect, useState } from 'react';
 import { FiImage } from 'react-icons/fi';
 import imageCompression from 'browser-image-compression';
 
 type DropImageProps = {
-  setUrlImage: (field: string, value: string) => void;
+  setFile: React.Dispatch<React.SetStateAction<File | null>>;
   label?: string;
   imgPreview: string | null;
 };
@@ -14,13 +13,13 @@ type DropImageProps = {
 export function DropImage({
   imgPreview,
   label = 'Arraste ou clique para adicionar imagem',
-  setUrlImage,
+  setFile,
 }: DropImageProps) {
   const [preview, setPreview] = useState<string | null>(imgPreview);
   const [dragActive, setDragActive] = useState(false);
-  const { startUpload, isUploading } = useUploadThing('productImage');
 
   useEffect(() => {
+
     return () => {
       if (preview) {
         URL.revokeObjectURL(preview);
@@ -28,9 +27,13 @@ export function DropImage({
     };
   }, [preview]);
 
-  const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
 
-  const MAX_SIZE = 5 * 1024 * 1024;
+  useEffect(() => {
+    setPreview(imgPreview);
+  }, [imgPreview]);
+
+  const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+  const MAX_SIZE = 4 * 1024 * 1024;
 
   const handleDrop = (event: React.DragEvent<HTMLLabelElement>) => {
     event.preventDefault();
@@ -73,17 +76,10 @@ export function DropImage({
 
         const url = URL.createObjectURL(compressedFile);
         setPreview(url);
-
-        const response = await startUpload([compressedFile]);
-
-        if (response) {
-          if (response[0].ufsUrl) {
-            setUrlImage('productImage', response[0].ufsUrl);
-          }
-        }
+        setFile(compressedFile);
       }
     },
-    [startUpload],
+    [setFile],
   );
 
   return (
@@ -127,6 +123,7 @@ export function DropImage({
     </label>
   );
 }
+
 
 // tect this at compile time: https://github.com/Effect-TS/language-service
 // [03:05:44.141] WARN (#26) handleCallbackRequest=443ms: Executing an Effect versioned 3.20.0 with a Runtime of version 3.17.7, you may want to dedupe the effect dependencies, you can use the language service plugin to detect this at compile time: https://github.com/Effect-TS/language-service

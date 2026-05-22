@@ -53,6 +53,7 @@ model Product {
   userId String
   name String
   productImage String?
+  imageKey String?
   typeProduct String
   category Category
 

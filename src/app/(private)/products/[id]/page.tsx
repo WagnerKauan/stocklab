@@ -95,7 +95,7 @@ export default async function ProductDetailPage({
       <div className="flex gap-8 mt-8">
         <div className="w-100 h-125 rounded-2xl overflow-hidden shadow-card ">
           <Image
-            src={product.productImage || '/product/jaqueta.jpg'}
+            src={product.productImage || '/product/placeHolderProduct.png'}
             alt={product.name}
             className="object-cover h-full w-full"
             priority

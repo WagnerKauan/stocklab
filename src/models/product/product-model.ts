@@ -4,6 +4,7 @@ export type ProductModel = {
   category: ProductCategory;
   typeProduct: string;
   productImage: string | null;
+  imageKey: string | null;
   variants: ProductVariant[];
 };
 

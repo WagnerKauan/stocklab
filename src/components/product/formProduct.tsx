@@ -12,6 +12,10 @@ import { actionCreateProduct } from '@/actions/product/action-create-product';
 import { v4 as uuidv4 } from 'uuid';
 import { validateProduct } from '@/validation/product';
 import { actionUpdateProduct } from '@/actions/product/action-update-product';
+import { useUploadThing } from '@/lib/uploadthing';
+import { actionDeleteImage } from '@/actions/product/action-delete-image';
+import { ImSpinner2 } from "react-icons/im";
+
 
 type FormProductProps = {
   initialData?: ProductModel;
@@ -34,12 +38,16 @@ export function FormProduct({ initialData }: FormProductProps) {
     name: initialData?.name || '',
     category: initialData?.category || 'roupas',
     typeProduct: initialData?.typeProduct || '',
-    productImage: initialData?.productImage || '/product/jaqueta.jpg',
+    productImage: initialData?.productImage || '',
+    imageKey: initialData?.imageKey || '',
   });
 
   const [errors, setErrors] = useState<ErrorInput[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
- 
+  const [imageFile, setImageFile] = useState<File | null>(null);
+
+  const { startUpload, isUploading } = useUploadThing('productImage');
 
   const handleChange = (field: string, value: string) => {
     setProduct(prev => ({
@@ -53,7 +61,6 @@ export function FormProduct({ initialData }: FormProductProps) {
     value: string | number,
     id?: string,
   ): boolean {
-
     const fieldSchema =
       productSchema.shape[field as keyof typeof productSchema.shape] ||
       variantSchema.shape[field as keyof typeof variantSchema.shape];
@@ -85,6 +92,7 @@ export function FormProduct({ initialData }: FormProductProps) {
       category: 'roupas',
       typeProduct: '',
       productImage: '',
+      imageKey: '',
     });
     setVariants([
       { id: uuidv4(), size: '', color: '', stock: 0, priceInCents: 0, sku: '' },
@@ -93,6 +101,7 @@ export function FormProduct({ initialData }: FormProductProps) {
   }
 
   async function handleSubmit() {
+    setIsLoading(true);
     const data = {
       ...product,
       variants,
@@ -102,35 +111,61 @@ export function FormProduct({ initialData }: FormProductProps) {
 
     if (errorsProduct.length > 0 || errorsVariants.length > 0) {
       setErrors([...errorsProduct, ...errorsVariants]);
+      setIsLoading(false);
       return;
     }
 
-    
+    if (errors.length > 0) {
+      setIsLoading(false);
+      return;
+    }
+
     if (initialData) {
       await handleEditProduct();
       return;
+    }
+
+    if (imageFile) {
+      try {
+        const result = await startUpload([imageFile]);
+
+        if (result && result[0].ufsUrl) {
+          data.productImage = result[0].ufsUrl;
+          data.imageKey = result[0].key;
+        }
+      } catch (error) {
+        console.error(error);
+        data.productImage = '/product/placeHolderProduct.png';
+        data.imageKey = '';
+      }
+    }else {
+      data.productImage = '/product/placeHolderProduct.png';
+      data.imageKey = '';
     }
 
     const response = await actionCreateProduct(data);
 
     if (response.code === 500) {
       alert('Erro desconhecido ao criar o produto');
+      setIsLoading(false);
       return;
     }
 
     if (response.code === 400) {
       setErrors(prev => [...prev, ...response.errors]);
+      setIsLoading(false);
       return;
     }
 
     alert('Produto criado');
 
     resetState();
+    setIsLoading(false);
   }
-
   async function handleEditProduct() {
     if (!initialData) {
       alert('Erro ao editar o produto');
+      setIsLoading(false);
       return;
     }
 
@@ -140,23 +175,51 @@ export function FormProduct({ initialData }: FormProductProps) {
       variants,
     };
 
+    if(imageFile) {
+      try {
+
+        const newImageUrl = await startUpload([imageFile])
+
+        if(newImageUrl && newImageUrl[0].ufsUrl) {
+          if(data.imageKey) {
+            const deleteImage = await actionDeleteImage(data.imageKey)
+            if(deleteImage.error) console.error(deleteImage.error)
+          }
+
+
+          data.productImage = newImageUrl[0].ufsUrl
+          data.imageKey = newImageUrl[0].key
+        }
+
+      }catch(error){
+        console.error(error)
+        alert('erro ao editar a imagem')
+      }
+    }
+
     const response = await actionUpdateProduct(data);
 
     switch (response.code) {
       case 500:
         alert('Erro desconhecido ao editar o produto');
+        setIsLoading(false);
         return;
       case 400:
         setErrors(prev => [...prev, ...response.errors]);
+        setIsLoading(false);
         return;
       case 404:
         alert('Produto nao encontrado');
+        setIsLoading(false);
         return;
     }
 
     alert('Produto editado');
     resetState();
+    setIsLoading(false);
   }
+
+
 
   return (
     <div className="max-w-187.5 w-full mx-auto flex flex-col h-full  gap-6">
@@ -213,10 +276,11 @@ export function FormProduct({ initialData }: FormProductProps) {
         </div>
       </div>
 
-      <DropImage imgPreview={initialData ? initialData.productImage : null}  
-        setUrlImage={handleChange}
+      <DropImage
+        imgPreview={product.productImage}
+        setFile={setImageFile}
       />
-            
+
       <VariationsTable
         errors={errors}
         setErrors={setErrors}
@@ -226,11 +290,12 @@ export function FormProduct({ initialData }: FormProductProps) {
       />
 
       <button
-        disabled={errors.length > 0}
+        disabled={errors.length > 0 || isLoading}
         onClick={handleSubmit}
-        className={`cursor-pointer px-6 py-3 bg-primary-normal text-white rounded-lg hover:bg-primary-hover transition-colors disabled:cursor-not-allowed`}
+        className={`cursor-pointer px-6 py-3 bg-primary-normal text-white rounded-lg 
+          flex items-center justify-center hover:bg-primary-hover transition-colors disabled:cursor-not-allowed`}
       >
-        {initialData ? 'Salvar alterações' : 'Criar produto'}
+        {isLoading ? (<ImSpinner2 className="animate-spin text-white text-2xl" />) :  (initialData ? 'Salvar alterações' : 'Criar produto')}
       </button>
     </div>
   );
