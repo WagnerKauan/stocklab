@@ -3,13 +3,14 @@ import { CardDashboard } from './_components/cardDashboard';
 import { FiAlertCircle, FiBox } from 'react-icons/fi';
 import { CardMain } from '@/components/layout/cardMain';
 import { StockIcon } from '@/components/icons/stockIcon';
-import { productRepository } from '@/repository/product';
 import { MINIMUM_STOCK_VARIANTS } from '@/settings/variablesGlobal';
 import { ListProductLowStock } from './_components/listProductLowStock';
+import { findAllProductsChached } from '@/lib/queries/product';
 
 export default async function Dashboard() {
 
-  const totalProducts = await productRepository.findAll();
+  const totalProducts = await findAllProductsChached();
+
   const productsWithLowStock = totalProducts.filter(product => {
     return product.variants.some(variant => variant.stock <= MINIMUM_STOCK_VARIANTS);
   });

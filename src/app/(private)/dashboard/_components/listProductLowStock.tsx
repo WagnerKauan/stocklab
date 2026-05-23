@@ -64,7 +64,7 @@ export function ListProductLowStock({
             <CardProductLowStock
               key={product.id}
               name={product.name}
-              image={product.productImage}
+              image={product.productImage || '/product/placeHolderProduct.png'}
               stock={stock}
               minimumStock={MINIMUM_STOCK_PRODUCT}
               variants={lowStockVariant}

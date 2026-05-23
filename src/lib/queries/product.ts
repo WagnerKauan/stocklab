@@ -1,5 +1,6 @@
 import { SyncVariants, ProductModel } from "@/models/product/product-model";
 import { productRepository } from "@/repository/product";
+import { sanitizeProduct } from "@/utils/sanitazeProduct";
 import { cache } from "react";
 
 
@@ -8,14 +9,18 @@ type ProductData = Omit<ProductModel, 'id'>
 
 export const findAllProductsChached = cache(
   async () => {
-    return await productRepository.findAll()
+    const products = await productRepository.findAll();
+
+    return products.map(product => sanitizeProduct(product, 'FRONT') as ProductModel)
   }
 )
 
 
 export const findProductByIdChached = cache(
   async (id: string) => {
-    return await productRepository.findById(id)
+    const product = await productRepository.findById(id);
+    if(!product) return null
+    return sanitizeProduct(product, 'FRONT')  as ProductModel
   }
 )
 

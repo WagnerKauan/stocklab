@@ -12,19 +12,16 @@ type CardProductLowStockProps = {
 
 type VariantLowStock = {
   id: string;
-  size: string;
-  color: string;
+  size: string | null;
+  color: string | null;
   stock: number;
 };
 
 export function CardProductLowStock({
   name,
   image,
-  stock,
-  minimumStock,
   variants,
 }: CardProductLowStockProps) {
-
   const isHalfStock = variants.every(
     variant => variant.stock >= MINIMUM_STOCK_VARIANTS / 2,
   );

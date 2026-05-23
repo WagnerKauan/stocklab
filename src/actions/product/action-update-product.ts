@@ -2,6 +2,7 @@
 
 import { findProductByIdChached, syncVariants, updateProduct } from "@/lib/queries/product";
 import { ProductModel } from "@/models/product/product-model";
+import { sanitizeProduct } from "@/utils/sanitazeProduct";
 import { validateProduct } from "@/validation/product";
 
 
@@ -36,16 +37,18 @@ export async function actionUpdateProduct(data: ProductModel) {
     }
   }
 
+  const sanitazedProduct = sanitizeProduct({ ...productData, variants }, 'DB');
+
   const variantsDB = productDB.variants;
 
   // Percorro as variações do front e verifico se elas existem no banco de dados se exister ignora se não crio a variante
-  const variantsToCreate = variants.filter(variant => !variantsDB.some(variantDB => variantDB.id === variant.id ))
+  const variantsToCreate = sanitazedProduct.variants.filter(variant => !variantsDB.some(variantDB => variantDB.id === variant.id ))
 
   //Percorro as variações do front e verifico se elas existem no banco de dados se exister eu atualizo se não ignoro
-  const variantsToUpdate = variants.filter(variant => variantsDB.some(variantDB => variantDB.id === variant.id))
+  const variantsToUpdate = sanitazedProduct.variants.filter(variant => variantsDB.some(variantDB => variantDB.id === variant.id))
 
   //Percorro as variações do banco de dados e verifico se elas existem no front se não existir eu deleto
-  const variantsToDelete = variantsDB.filter(variantDB => !variants.some(variant => variant.id === variantDB.id))
+  const variantsToDelete = variantsDB.filter(variantDB => !sanitazedProduct.variants.some(variant => variant.id === variantDB.id))
 
   const variantsToSync = {
     productId: productDB.id,
@@ -54,7 +57,7 @@ export async function actionUpdateProduct(data: ProductModel) {
     toDelete: variantsToDelete,
   }
 
-  const resultUpdateProduct = await updateProduct({ variants, ...productData });
+  const resultUpdateProduct = await updateProduct({ ...sanitazedProduct, id: productDB.id });
   const resultSyncVariants = await syncVariants(variantsToSync);
 
   return {

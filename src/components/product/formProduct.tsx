@@ -14,8 +14,7 @@ import { validateProduct } from '@/validation/product';
 import { actionUpdateProduct } from '@/actions/product/action-update-product';
 import { useUploadThing } from '@/lib/uploadthing';
 import { actionDeleteImage } from '@/actions/product/action-delete-image';
-import { ImSpinner2 } from "react-icons/im";
-
+import { ImSpinner2 } from 'react-icons/im';
 
 type FormProductProps = {
   initialData?: ProductModel;
@@ -45,9 +44,8 @@ export function FormProduct({ initialData }: FormProductProps) {
   const [errors, setErrors] = useState<ErrorInput[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const [imageFile, setImageFile] = useState<File | null>(null);
-
   const { startUpload, isUploading } = useUploadThing('productImage');
+  const [imageFile, setImageFile] = useState<File | null>(null);
 
   const handleChange = (field: string, value: string) => {
     setProduct(prev => ({
@@ -138,7 +136,7 @@ export function FormProduct({ initialData }: FormProductProps) {
         data.productImage = '/product/placeHolderProduct.png';
         data.imageKey = '';
       }
-    }else {
+    } else {
       data.productImage = '/product/placeHolderProduct.png';
       data.imageKey = '';
     }
@@ -175,25 +173,22 @@ export function FormProduct({ initialData }: FormProductProps) {
       variants,
     };
 
-    if(imageFile) {
+    if (imageFile) {
       try {
+        const newImageUrl = await startUpload([imageFile]);
 
-        const newImageUrl = await startUpload([imageFile])
-
-        if(newImageUrl && newImageUrl[0].ufsUrl) {
-          if(data.imageKey) {
-            const deleteImage = await actionDeleteImage(data.imageKey)
-            if(deleteImage.error) console.error(deleteImage.error)
+        if (newImageUrl && newImageUrl[0].ufsUrl) {
+          if (data.imageKey) {
+            const deleteImage = await actionDeleteImage(data.imageKey);
+            if (deleteImage.error) console.error(deleteImage.error);
           }
 
-
-          data.productImage = newImageUrl[0].ufsUrl
-          data.imageKey = newImageUrl[0].key
+          data.productImage = newImageUrl[0].ufsUrl;
+          data.imageKey = newImageUrl[0].key;
         }
-
-      }catch(error){
-        console.error(error)
-        alert('erro ao editar a imagem')
+      } catch (error) {
+        console.error(error);
+        alert('erro ao editar a imagem');
       }
     }
 
@@ -218,8 +213,6 @@ export function FormProduct({ initialData }: FormProductProps) {
     resetState();
     setIsLoading(false);
   }
-
-
 
   return (
     <div className="max-w-187.5 w-full mx-auto flex flex-col h-full  gap-6">
@@ -279,6 +272,8 @@ export function FormProduct({ initialData }: FormProductProps) {
       <DropImage
         imgPreview={product.productImage}
         setFile={setImageFile}
+        errors={errors}
+        setErrors={setErrors}
       />
 
       <VariationsTable
@@ -295,7 +290,13 @@ export function FormProduct({ initialData }: FormProductProps) {
         className={`cursor-pointer px-6 py-3 bg-primary-normal text-white rounded-lg 
           flex items-center justify-center hover:bg-primary-hover transition-colors disabled:cursor-not-allowed`}
       >
-        {isLoading ? (<ImSpinner2 className="animate-spin text-white text-2xl" />) :  (initialData ? 'Salvar alterações' : 'Criar produto')}
+        {isLoading ? (
+          <ImSpinner2 className="animate-spin text-white text-2xl" />
+        ) : initialData ? (
+          'Salvar alterações'
+        ) : (
+          'Criar produto'
+        )}
       </button>
     </div>
   );
