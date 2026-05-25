@@ -21,7 +21,7 @@ export function SelectWithLabel({
 
   return (
     <>
-      <label htmlFor={field} className="text-secondary-normal">
+      <label htmlFor={field} className="text-secondary-normal text-sm">
         {label}
       </label>
       <select

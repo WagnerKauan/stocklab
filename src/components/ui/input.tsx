@@ -8,7 +8,7 @@ type InputWithLabelProps = {
   handleChange: (field: string, value: string) => void;
   handleOnBlur?: (field: string, value: string) => void;
   value: string;
-  errors: { message: string; field: string }[];
+  errors: { message: string; field: string; id?: string }[];
 };
 
 export function InputWithLabel({
@@ -27,14 +27,14 @@ export function InputWithLabel({
   
   return (
     <>
-      <label htmlFor={field} className="text-secondary-normal">
+      <label htmlFor={field} className="text-secondary-normal text-sm">
         {label}
       </label>
       <input
         type={type}
         id={field}
         placeholder={placeholder}
-        className={`w-full p-2 rounded-lg bg-background-normal border 
+        className={`w-full px-2 py-1.5 rounded-lg bg-background-normal border 
            text-secondary-normal focus:outline-secondary-light/20 ${error ? 'border-error' : 'border-secondary-light/10'}`}
         onChange={e => handleChange(field, e.target.value)}
         value={value}
