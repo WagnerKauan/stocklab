@@ -28,12 +28,13 @@ model User {
   id String @id @default(cuid())
   name String
   email  String @unique
-  password String
+  password String?
   image String?
   createdAt DateTime @default(now())
 
   userSettings UserSettings?
   products Product[]
+  accounts Account[]
 }
 
 
@@ -45,6 +46,18 @@ model UserSettings  {
   lowVariantAlert Int? 
 
   user User @relation(fields: [userId], references: [id])
+}
+
+model Account {
+  id String @id @default(cuid())
+  provider String
+  providerAccountId String
+
+  userId String
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([provider, providerAccountId])
 }
 
 

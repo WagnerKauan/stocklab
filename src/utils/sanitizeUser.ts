@@ -25,10 +25,18 @@ const sanitizers = {
   },
 };
 
-export function sanitizeUser(user: UserData, type: 'DB' | 'FRONT') {
+export function sanitizeUser(user: UserData, type: 'DB' | 'FRONT'): UserData {
   return {
     ...user,
     name: sanitizers[type].name(user.name),
     email: sanitizers[type].email(user.email),
   };
 }
+
+export function sanitizeLogin(data: { email: string; password: string }, type: 'DB' | 'FRONT') {
+  return {
+    ...data,
+    email: sanitizers[type].email(data.email),
+  };
+}
+

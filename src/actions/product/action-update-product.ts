@@ -1,9 +1,11 @@
 "use server";
 
+import { getCurrentUser } from "@/lib/auth/get-current-user";
 import { findProductByIdChached, syncVariants, updateProduct } from "@/lib/queries/product";
 import { ProductModel } from "@/models/product/product-model";
 import { sanitizeProduct } from "@/utils/sanitazeProduct";
 import { validateProduct } from "@/validation/product";
+import { redirect } from "next/navigation";
 
 
 /*
@@ -12,7 +14,8 @@ import { validateProduct } from "@/validation/product";
 */
 
 export async function actionUpdateProduct(data: ProductModel) {
-
+  const user = await getCurrentUser();
+  if(!user) return redirect('/login');
 
   const { variants, ...productData } = data;
 

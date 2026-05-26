@@ -5,8 +5,11 @@ import { prisma } from '@/lib/prisma';
 type ProductData = Omit<ProductModel, 'id'>;
 
 export class SqliteProductRepository implements ProductRepository {
-  async findAll(): Promise<ProductModel[]> {
+  async findAll(userId: string): Promise<ProductModel[]> {
     const products = await prisma.product.findMany({
+      where: {
+        userId: userId,
+      },  
       include: {
         variants: true,
       },
@@ -15,10 +18,11 @@ export class SqliteProductRepository implements ProductRepository {
     return products;
   }
 
-  async findById(id: string): Promise<ProductModel | null> {
+  async findById(id: string, userId: string): Promise<ProductModel | null> {
     const product = await prisma.product.findUnique({
       where: {
         id: id,
+        userId: userId,
       },
       include: {
         variants: true,

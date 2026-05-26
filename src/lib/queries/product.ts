@@ -8,8 +8,8 @@ type ProductData = Omit<ProductModel, 'id'>
 
 
 export const findAllProductsChached = cache(
-  async () => {
-    const products = await productRepository.findAll();
+  async (userId: string) => {
+    const products = await productRepository.findAll(userId);
 
     return products.map(product => sanitizeProduct(product, 'FRONT') as ProductModel)
   }
@@ -17,8 +17,8 @@ export const findAllProductsChached = cache(
 
 
 export const findProductByIdChached = cache(
-  async (id: string) => {
-    const product = await productRepository.findById(id);
+  async (id: string, userId: string) => {
+    const product = await productRepository.findById(id, userId);
     if(!product) return null
     return sanitizeProduct(product, 'FRONT')  as ProductModel
   }

@@ -5,8 +5,14 @@ import { FiPackage,  } from 'react-icons/fi';
 import { FiPlus } from 'react-icons/fi';
 import { ListProducts } from './_components/listProducts';
 import { findAllProductsChached } from '@/lib/queries/product';
+import { getCurrentUser } from '@/lib/auth/get-current-user';
+import { redirect } from 'next/navigation';
 
 export default async function Products() {
+  const user = await getCurrentUser();
+
+  if(!user) return redirect('/login');
+
   const products = await findAllProductsChached();
 
   return (

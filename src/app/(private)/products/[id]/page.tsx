@@ -1,7 +1,8 @@
+"use server";
+
 import { ClipboardIcon } from '@/components/icons/clipboardIcon';
 import { CardMain } from '@/components/layout/cardMain';
 import { TitleSection } from '@/components/ui/titleSection';
-import { productRepository } from '@/repository/product';
 import Image from 'next/image';
 import { FiDollarSign, FiEdit2, FiTag } from 'react-icons/fi';
 import { CardInfo } from './_components/cardInfo';
@@ -12,12 +13,18 @@ import Link from 'next/link';
 import { formatCurrencyInput } from '@/utils/formatPrice';
 import { findProductByIdChached } from '@/lib/queries/product';
 import { sortVariants } from '@/utils/sizeOrder';
+import { getCurrentUser } from '@/lib/auth/get-current-user';
+import { redirect } from 'next/navigation';
 
 export default async function ProductDetailPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const user = await getCurrentUser();
+
+  if (!user) return redirect('/login');
+
   const { id } = await params;
 
   const product = await findProductByIdChached(id);
@@ -178,7 +185,9 @@ export default async function ProductDetailPage({
                       </td>
 
                       <td className="text-center py-1.5">
-                        <span>{formatCurrencyInput(variant.priceInCents).formatted}</span>
+                        <span>
+                          {formatCurrencyInput(variant.priceInCents).formatted}
+                        </span>
                       </td>
                     </tr>
                   );

@@ -1,12 +1,13 @@
 'use client';
 
-import { actionCreateUser } from '@/actions/user/action-create-user';
+import { actionAuthUser } from '@/actions/user/action-auth-user';
 import { InputWithLabel } from '@/components/ui/input';
 import { userSchema } from '@/schemas/user/user.schema';
-import { sanitizeUser } from '@/utils/sanitizeUser';
+import { sanitizeLogin } from '@/utils/sanitizeUser';
+import { validateLogin } from '@/validation/user';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 type ErrorsInput = {
   message: string;
@@ -14,13 +15,13 @@ type ErrorsInput = {
   id?: string;
 };
 
-export function RegisterForm() {
+export function LoginForm() {
   const [user, setUser] = useState({
-    name: '',
     email: '',
     password: '',
   });
   const [errors, setErrors] = useState<ErrorsInput[]>([]);
+  const [loading, setLoading] = useState(false);
 
   function handleChange(field: string, value: string) {
     setUser(prev => ({
@@ -30,41 +31,54 @@ export function RegisterForm() {
   }
 
   async function handleSubmit(e: React.ChangeEvent<HTMLFormElement>) {
+    setLoading(true);
     e.preventDefault();
 
-    const isValidUser = userSchema.safeParse(user);
+    const errors = validateLogin(user);
 
-    if (!isValidUser.success) {
-      const errorsUser = isValidUser.error.issues.reduce<ErrorsInput[]>(
-        (errs, issue) => {
-          errs.push({
-            message: issue.message,
-            field: issue.path[0] as string,
-          });
-          return errs;
-        },
-        [],
-      );
-
-      setErrors(prev => [...prev, ...errorsUser]);
+    if (errors.length > 0) {
+      setErrors(prev => [...prev, ...errors]);
+      setLoading(false);
       return;
     }
 
-    if(errors.length > 0) return
+    if (errors.length > 0) {
+      setLoading(false);
+      return;
+    };
 
-    const sanitizedUser = sanitizeUser(user, 'DB');
-    console.log(sanitizedUser)
-    // const result = await actionCreateUser(sanitizedUser);
-    
-    // if(result.code === 500) return alert('Ocorreu um erro ao criar a sua conta, tente novamente mais tarde.');
-    
-    // if(result.errors.length > 0) {
-    //   setErrors(prev => [...prev, ...result.errors]);
-    //   return;
-    // }
-    
-    // alert(`Conta criada com sucesso! ${user.name}, seja bem-vindo!`);
-    // if(result.status) return redirect('/dashboard');
+    const sanitizedUser = sanitizeLogin(user, 'DB');
+
+    const data = new FormData();
+
+    data.append('email', sanitizedUser.email);
+    data.append('password', sanitizedUser.password);
+    console.log('chegou aqi');
+
+    const result = await actionAuthUser(data);
+
+    if(result.code === 500){
+      alert('Ocorreu um erro ao fazer login, tente novamente mais tarde.')
+      setLoading(false);
+      return;
+    }
+
+    if(result.errors.length > 0) {
+      result.errors.forEach(err => {
+        if(err.field === 'secret') {
+          alert(err.message);
+        }else {
+          setErrors(prev => [...prev, err]);
+        }
+      })
+
+      setLoading(false);
+      return;
+    }
+
+    setLoading(false);
+
+    return redirect('/dashboard');
   }
 
   function handleBlur(field: string, value: string) {
@@ -87,28 +101,19 @@ export function RegisterForm() {
     setErrors(prev => prev.filter(err => err.field !== field));
   }
 
+
   return (
     <div className="mt-6">
       <form className="space-y-4" onSubmit={handleSubmit}>
         <div className="flex flex-col items-center">
-          <h4 className="text-2xl">Crie sua conta</h4>
+          <h4 className="text-2xl">Bem-vindo de volta</h4>
           <p className="text-[12px] text-secondary-light w-full max-w-62.5 text-center">
-            Comece agora e tenha mais controle sobre os produtos da sua loja.
+            Acesse sua conta e gerencie seu estoque com mais controle e
+            eficiência.
           </p>
         </div>
 
         <div className="space-y-4">
-          <div className="relative">
-            <InputWithLabel
-              field="name"
-              label="Nome"
-              placeholder="Ex: Wagner..."
-              errors={errors}
-              value={user.name}
-              handleChange={handleChange}
-              handleOnBlur={handleBlur}
-            />
-          </div>
           <div className="relative">
             <InputWithLabel
               field="email"
@@ -135,10 +140,11 @@ export function RegisterForm() {
 
           <button
             type="submit"
+            disabled={loading || errors.length > 0}
             className="text-white bg-primary-normal p-2 w-full rounded-lg mt-1 
-            hover:bg-primary-hover transition-colors cursor-pointer"
+            hover:bg-primary-hover transition-colors cursor-pointer disabled:cursor-not-allowed"
           >
-            Criar conta
+            {loading ? 'Entrando...' : 'Entrar'}
           </button>
         </div>
       </form>
@@ -158,9 +164,9 @@ export function RegisterForm() {
       </button>
 
       <span className="text-secondary-normal w-full text-center block">
-        Ja possui uma conta?{' '}
-        <Link href="/login" className="text-secondary-dark cursor-pointer hover:underline font-semibold">
-          Login
+        Não possui uma conta?{' '}
+        <Link href="/register" className="text-secondary-dark cursor-pointer hover:underline font-semibold">
+          Cadastre-se
         </Link>
       </span>
     </div>

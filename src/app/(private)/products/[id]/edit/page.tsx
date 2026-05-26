@@ -1,27 +1,33 @@
-import { CardMain } from "@/components/layout/cardMain";
-import { FormProduct } from "@/components/product/formProduct";
-import { findProductByIdChached } from "@/lib/queries/product";
-import { sortVariants } from "@/utils/sizeOrder";
+'use server';
+import { CardMain } from '@/components/layout/cardMain';
+import { FormProduct } from '@/components/product/formProduct';
+import { getCurrentUser } from '@/lib/auth/get-current-user';
+import { findProductByIdChached } from '@/lib/queries/product';
+import { sortVariants } from '@/utils/sizeOrder';
+import { redirect } from 'next/navigation';
 
+export default async function ProductEdit({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const user = await getCurrentUser();
 
+  if (!user) return redirect('/login');
 
+  const { id } = await params;
 
+  const product = await findProductByIdChached(id, user.id);
 
-export default async function ProductEdit({params}: {params: Promise<{id: string}>}) {
-
-  const { id } = await params
-
-  const product = await findProductByIdChached(id)
-
-  if(!product) {
-    return <CardMain>Product not found</CardMain>
+  if (!product) {
+    return <CardMain>Product not found</CardMain>;
   }
 
-  product.variants = sortVariants(product.variants)
+  product.variants = sortVariants(product.variants);
 
-  return(
+  return (
     <CardMain>
       <FormProduct initialData={product} />
     </CardMain>
-  )
+  );
 }

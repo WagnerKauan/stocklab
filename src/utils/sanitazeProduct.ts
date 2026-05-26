@@ -64,7 +64,6 @@ const sanitizers = {
       if(textFormat === 'Calcados') v = 'Calçados';
       if(textFormat === 'Acessorios') v = 'Acessórios';
 
-      console.log(v)
       return v;
     },
 

@@ -1,3 +1,5 @@
+"use server";
+
 import { TitleSection } from '@/components/ui/titleSection';
 import { CardDashboard } from './_components/cardDashboard';
 import { FiAlertCircle, FiBox } from 'react-icons/fi';
@@ -6,10 +8,16 @@ import { StockIcon } from '@/components/icons/stockIcon';
 import { MINIMUM_STOCK_VARIANTS } from '@/settings/variablesGlobal';
 import { ListProductLowStock } from './_components/listProductLowStock';
 import { findAllProductsChached } from '@/lib/queries/product';
+import { getCurrentUser } from '@/lib/auth/get-current-user';
+import { redirect } from 'next/navigation';
 
 export default async function Dashboard() {
 
-  const totalProducts = await findAllProductsChached();
+  const user = await getCurrentUser();
+
+  if(!user) return redirect('/login');
+
+  const totalProducts = await findAllProductsChached(user.id);
 
   const productsWithLowStock = totalProducts.filter(product => {
     return product.variants.some(variant => variant.stock <= MINIMUM_STOCK_VARIANTS);

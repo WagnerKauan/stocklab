@@ -4,7 +4,12 @@ const nextConfig: NextConfig = {
   /* config options here */
 
   images: {
-    domains: ['11mwnyy0hv.ufs.sh'],
+    remotePatterns: [{
+      protocol: 'https',
+      hostname: '11mwnyy0hv.ufs.sh',
+      port: '',
+      pathname: '/**',
+    }],
     
   }
 };

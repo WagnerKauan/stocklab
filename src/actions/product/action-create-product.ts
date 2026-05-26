@@ -1,11 +1,18 @@
 'use server';
 
+import { getCurrentUser } from '@/lib/auth/get-current-user';
 import { createProduct } from '@/lib/queries/product';
 import type { ProductData } from '@/models/product/product-model';
 import { sanitizeProduct } from '@/utils/sanitazeProduct';
 import { validateProduct } from '@/validation/product';
+import { redirect } from 'next/navigation';
 
 export async function actionCreateProduct(data: ProductData) {
+  
+  const user = await getCurrentUser();
+
+  if(!user) return redirect('/login');
+
   const { variants, ...product } = { ...data };
 
   const { errorsProduct, errorsVariants } = validateProduct({
@@ -25,7 +32,7 @@ export async function actionCreateProduct(data: ProductData) {
 
   const result = await createProduct({
     ...sanitazedProduct,
-    userId: 'teste123',
+    userId: user.id,
   });
 
   if (!result) {
