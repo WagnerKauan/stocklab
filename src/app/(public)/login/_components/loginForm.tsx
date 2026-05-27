@@ -7,7 +7,7 @@ import { sanitizeLogin } from '@/utils/sanitizeUser';
 import { validateLogin } from '@/validation/user';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 type ErrorsInput = {
   message: string;
@@ -45,7 +45,7 @@ export function LoginForm() {
     if (errors.length > 0) {
       setLoading(false);
       return;
-    };
+    }
 
     const sanitizedUser = sanitizeLogin(user, 'DB');
 
@@ -53,24 +53,23 @@ export function LoginForm() {
 
     data.append('email', sanitizedUser.email);
     data.append('password', sanitizedUser.password);
-    console.log('chegou aqi');
 
     const result = await actionAuthUser(data);
 
-    if(result.code === 500){
-      alert('Ocorreu um erro ao fazer login, tente novamente mais tarde.')
+    if (result.code === 500) {
+      alert('Ocorreu um erro ao fazer login, tente novamente mais tarde.');
       setLoading(false);
       return;
     }
 
-    if(result.errors.length > 0) {
+    if (result.errors.length > 0) {
       result.errors.forEach(err => {
-        if(err.field === 'secret') {
+        if (err.field === 'secret') {
           alert(err.message);
-        }else {
+        } else {
           setErrors(prev => [...prev, err]);
         }
-      })
+      });
 
       setLoading(false);
       return;
@@ -101,6 +100,17 @@ export function LoginForm() {
     setErrors(prev => prev.filter(err => err.field !== field));
   }
 
+   function handleGoogleLogin() {
+    try {
+      const url = process.env.NEXT_PUBLIC_URL || 'http://localhost:3000';
+      window.location.href = `${url}/api/auth/google`;
+    } catch (error) {
+      console.error('Erro ao fazer login com o Google:', error);
+      alert(
+        'Ocorreu um erro ao fazer login com o Google, tente novamente mais tarde.',
+      );
+    }
+  }
 
   return (
     <div className="mt-6">
@@ -158,6 +168,8 @@ export function LoginForm() {
       <button
         className="flex items-center justify-center gap-1.5 bg-secondary-dark text-white p-2 w-full rounded-lg 
         cursor-pointer hover:bg-secondary-normal transition-colors mb-4"
+        type="button"
+        onClick={handleGoogleLogin}
       >
         <img src="/google.png" alt="Imagem do google" />
         Google
@@ -165,7 +177,10 @@ export function LoginForm() {
 
       <span className="text-secondary-normal w-full text-center block">
         Não possui uma conta?{' '}
-        <Link href="/register" className="text-secondary-dark cursor-pointer hover:underline font-semibold">
+        <Link
+          href="/register"
+          className="text-secondary-dark cursor-pointer hover:underline font-semibold"
+        >
           Cadastre-se
         </Link>
       </span>

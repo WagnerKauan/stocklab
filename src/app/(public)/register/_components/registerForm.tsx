@@ -19,6 +19,7 @@ export function RegisterForm() {
     name: '',
     email: '',
     password: '',
+    image: '',
   });
   const [errors, setErrors] = useState<ErrorsInput[]>([]);
 
@@ -50,21 +51,24 @@ export function RegisterForm() {
       return;
     }
 
-    if(errors.length > 0) return
+    if (errors.length > 0) return;
 
     const sanitizedUser = sanitizeUser(user, 'DB');
-    console.log(sanitizedUser)
-    // const result = await actionCreateUser(sanitizedUser);
-    
-    // if(result.code === 500) return alert('Ocorreu um erro ao criar a sua conta, tente novamente mais tarde.');
-    
-    // if(result.errors.length > 0) {
-    //   setErrors(prev => [...prev, ...result.errors]);
-    //   return;
-    // }
-    
-    // alert(`Conta criada com sucesso! ${user.name}, seja bem-vindo!`);
-    // if(result.status) return redirect('/dashboard');
+
+    const result = await actionCreateUser(sanitizedUser);
+
+    if (result.code === 500)
+      return alert(
+        'Ocorreu um erro ao criar a sua conta, tente novamente mais tarde.',
+      );
+
+    if (result.errors.length > 0) {
+      setErrors(prev => [...prev, ...result.errors]);
+      return;
+    }
+
+    alert(`Conta criada com sucesso! ${user.name}, seja bem-vindo!`);
+    if (result.status) return redirect('/dashboard');
   }
 
   function handleBlur(field: string, value: string) {
@@ -85,6 +89,20 @@ export function RegisterForm() {
     }
 
     setErrors(prev => prev.filter(err => err.field !== field));
+  }
+
+  function handleGoogleLogin(e: React.MouseEvent<HTMLButtonElement>) {
+    e.preventDefault();
+    console.log('Login com Google');
+    try {
+      const url = process.env.NEXT_PUBLIC_URL || 'http://localhost:3000';
+      window.location.href = `${url}/api/auth/google`;
+    } catch (error) {
+      console.error('Erro ao fazer login com o Google:', error);
+      alert(
+        'Ocorreu um erro ao fazer login com o Google, tente novamente mais tarde.',
+      );
+    }
   }
 
   return (
@@ -152,6 +170,8 @@ export function RegisterForm() {
       <button
         className="flex items-center justify-center gap-1.5 bg-secondary-dark text-white p-2 w-full rounded-lg 
         cursor-pointer hover:bg-secondary-normal transition-colors mb-4"
+        type="button"
+        onClick={handleGoogleLogin}
       >
         <img src="/google.png" alt="Imagem do google" />
         Google
@@ -159,7 +179,10 @@ export function RegisterForm() {
 
       <span className="text-secondary-normal w-full text-center block">
         Ja possui uma conta?{' '}
-        <Link href="/login" className="text-secondary-dark cursor-pointer hover:underline font-semibold">
+        <Link
+          href="/login"
+          className="text-secondary-dark cursor-pointer hover:underline font-semibold"
+        >
           Login
         </Link>
       </span>

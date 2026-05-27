@@ -3,8 +3,10 @@
     {
       "id": "1",
       "name": "Jaqueta Oversized Jeans",
-      "category": "jaqueta",
+      "category": "roupas",
       "productImage": "/product/jaqueta.jpg",
+      "typeProduct": "jaqueta",
+      "imageKey": "",
       "variants": [
         {
           "id": "1-1",

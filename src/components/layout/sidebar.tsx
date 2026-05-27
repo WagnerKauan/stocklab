@@ -10,6 +10,7 @@ import { GoSidebarCollapse } from 'react-icons/go';
 import { AnchorHTMLAttributes, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
+import { actionLogoutUser } from '@/actions/user/action-logout-user';
 
 export function Sidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -58,6 +59,13 @@ export function Sidebar() {
       },
     ],
   };
+
+
+  async function handleLogout(e: React.MouseEvent<HTMLAnchorElement>) {
+    e.preventDefault();
+
+    await actionLogoutUser();
+  }
 
   return (
     <aside
@@ -171,11 +179,12 @@ export function Sidebar() {
         <NavLink
           text={isCollapsed ? '' : 'Sair'}
           icon={<FiLogOut size={18} />}
-          href="/dashboard"
+          href="/login"
           variant="secondary"
           alingment={!isCollapsed ? 'left' : 'center'}
           collapse={isCollapsed}
           className={`hover:bg-error ${isCollapsed && 'py-6 flex items-center justify-center '}`}
+          onClick={handleLogout}
         />
       </div>
     </aside>

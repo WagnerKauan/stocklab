@@ -1,5 +1,6 @@
 import { UserData } from '@/models/user/user-model';
-import { User } from '../../../generated/prisma/client';
+import { Account, User } from '../../../generated/prisma/client';
+import { CreateAccountParams, FindAccountById, } from '@/models/queries/queries';
 import { UserRepository } from './user-repository';
 import { prisma } from '@/lib/prisma';
 
@@ -9,27 +10,11 @@ export class SqliteUserRepository implements UserRepository {
       where: {
         id: id,
       },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        image: true,
-        userSettings: true,
-      },
-      
-    }) as User | null;
+    });
   }
 
   async findAll(): Promise<User[]> {
-    return await prisma.user.findMany({
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        image: true,
-        userSettings: true,
-      },
-    }) as unknown as User[];
+    return await prisma.user.findMany();
   }
 
   async findByEmail(email: string): Promise<User | null> {
@@ -37,19 +22,33 @@ export class SqliteUserRepository implements UserRepository {
       where: {
         email: email,
       },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        image: true,
-        userSettings: true,
-      },
-    }) as User | null;
+    });
   }
 
   async create(user: UserData): Promise<User> {
     return await prisma.user.create({
       data: user,
     });
+  }
+
+  async findAccountByid({provider, providerAccountId}: FindAccountById): Promise<Account | null> {
+    return await prisma.account.findUnique({
+      where: {
+       provider_providerAccountId: {
+          provider: provider,
+          providerAccountId: providerAccountId,
+       }
+      }
+    })
+  }
+
+  async createAccount({userId, provider, providerAccountId}: CreateAccountParams): Promise<Account> {
+    return await prisma.account.create({
+      data: {
+        userId: userId,
+        provider: provider,
+        providerAccountId: providerAccountId,
+      }
+    })
   }
 }

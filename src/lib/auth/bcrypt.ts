@@ -12,5 +12,6 @@ export async function createHash(password: string) {
 
 
 export async function compareHash(password: string, hash: string) {
+
   return await bcrypt.compare(password, hash);
 }
