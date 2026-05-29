@@ -21,9 +21,9 @@ export default function RootLayout({
   return (
     <html
       lang="pt-BR"
-      className={`${figTree.className} h-full antialiased`}
+      className={`${figTree.className} min-h-dvh h-full antialiased`}
     >
-      <body>{children}</body>
+      <body className="min-h-dvh h-full bg-background-normal">{children}</body>
     </html>
   );
 }

@@ -30,8 +30,8 @@ export function CardProductLowStock({
     <div className="w-full border border-secondary-light/20 rounded-3xl shadow-card p-4">
       <div className="flex items-center gap-4">
         {/* Imagem */}
-        <div className="relative h-25 w-23 flex items-center justify-center rounded-xl overflow-hidden border border-secondary-light/20">
-          <Image src={image} alt={name} className="object-cover" fill />
+        <div className="h-25 w-23 flex items-center justify-center rounded-xl overflow-hidden border border-secondary-light/20">
+          <Image src={image} alt={name} className="object-cover w-full h-full" height={100} width={100} />
         </div>
 
         {/* Informações */}

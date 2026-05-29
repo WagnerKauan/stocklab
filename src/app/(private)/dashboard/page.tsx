@@ -1,4 +1,4 @@
-"use server";
+'use server';
 
 import { TitleSection } from '@/components/ui/titleSection';
 import { CardDashboard } from './_components/cardDashboard';
@@ -12,15 +12,16 @@ import { getCurrentUser } from '@/lib/auth/get-current-user';
 import { redirect } from 'next/navigation';
 
 export default async function Dashboard() {
-
   const user = await getCurrentUser();
 
-  if(!user) return redirect('/login');
+  if (!user) return redirect('/login');
 
   const totalProducts = await findAllProductsChached(user.id);
 
   const productsWithLowStock = totalProducts.filter(product => {
-    return product.variants.some(variant => variant.stock <= MINIMUM_STOCK_VARIANTS);
+    return product.variants.some(
+      variant => variant.stock <= MINIMUM_STOCK_VARIANTS,
+    );
   });
 
   const totalInStock = totalProducts.reduce((total, product) => {
@@ -32,13 +33,14 @@ export default async function Dashboard() {
   }, 0);
 
   const variationsInLowStock = productsWithLowStock.reduce((total, product) => {
-    const lowStockVariants = product.variants.filter(variant => variant.stock <= MINIMUM_STOCK_VARIANTS);
+    const lowStockVariants = product.variants.filter(
+      variant => variant.stock <= MINIMUM_STOCK_VARIANTS,
+    );
     return total + lowStockVariants.length;
   }, 0);
 
-
   return (
-    <>
+    <div className="flex flex-col gap-6 flex-1">
       <div className=" grid grid-cols-3 gap-6">
         <CardDashboard
           title="Produtos"
@@ -61,7 +63,7 @@ export default async function Dashboard() {
       </div>
 
       <CardMain>
-        <div className="flex flex-col gap-8 h-full">
+        <div className="flex flex-col gap-8">
           <div>
             <TitleSection
               typeTitle="warning"
@@ -71,13 +73,9 @@ export default async function Dashboard() {
             />
           </div>
 
-          
-            
-          
-
-              <ListProductLowStock products={productsWithLowStock} />
+          <ListProductLowStock products={productsWithLowStock} />
         </div>
       </CardMain>
-    </>
+    </div>
   );
 }

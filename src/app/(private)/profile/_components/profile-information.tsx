@@ -6,8 +6,14 @@ import Image from 'next/image';
 import { useState } from 'react';
 import { FiCamera } from 'react-icons/fi';
 
-export function ProfileSettings() {
-  const [updateName, setUpdateName] = useState('');
+type ProfileInformationProps = {
+  name: string;
+  email: string;
+  image: string | null;
+}
+
+export function ProfileSettings({ name, email, image }: ProfileInformationProps) {
+  const [updateName, setUpdateName] = useState(name);
   const [errors, setErrors] = useState<ErrorsInput[]>([]);
 
   function handleChange(field: string, value: string) {
@@ -33,7 +39,7 @@ export function ProfileSettings() {
         <div className="flex flex-col items-center gap-2">
           <div className="relative w-20 h-20 rounded-lg overflow-hidden border border-secondary-light/20 shadow-sm group">
             <Image
-              src="/avatar-placeholder3.png"
+              src={image || '/avatar-placeholder3.png'}
               alt="Avatar"
               width={100}
               height={100}
@@ -91,7 +97,7 @@ export function ProfileSettings() {
                 id="email"
                 type="text"
                 disabled
-                value={'kauanw@gmail.com'}
+                value={email}
                 className={`w-full px-2 py-1.5 rounded-lg bg-background-normal border 
            text-secondary-normal focus:outline-secondary-light/20 border-secondary-light/10 disabled:bg-secondary-light/10 disabled:border-secondary-light/10 disabled:text-secondary-light disabled:cursor-not-allowed`}
               />

@@ -7,13 +7,17 @@ import { FiPackage } from 'react-icons/fi';
 import { FiUser } from 'react-icons/fi';
 import { FiSettings } from 'react-icons/fi';
 import { GoSidebarCollapse } from 'react-icons/go';
-import { AnchorHTMLAttributes, useState } from 'react';
+import { AnchorHTMLAttributes } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { actionLogoutUser } from '@/actions/user/action-logout-user';
 
-export function Sidebar() {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+type SidebarProps = {
+  isCollapsed: boolean;
+  setIsCollapsed: React.Dispatch<React.SetStateAction<boolean>>;
+};
+export function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
+  
   const href = usePathname();
 
   const navLinks = {

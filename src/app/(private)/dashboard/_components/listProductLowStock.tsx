@@ -7,6 +7,7 @@ import {
 import { CardProductLowStock } from './cardProductLowStock';
 import { ProductModel } from '@/models/product/product-model';
 import { useState } from 'react';
+import { LowStockEmptyState } from './lowStockEmptyState';
 
 export function ListProductLowStock({
   products,
@@ -36,11 +37,12 @@ export function ListProductLowStock({
 
   return (
     <>
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 border-y py-4 border-secondary-light/20">
         {tags.map(tag => (
           <button
-            className={`flex items-center justify-center bg-background-normal rounded-lg px-8 py-2 text-[14px]
-          hover:bg-secondary-normal hover:text-white text-secondary-normal cursor-pointer transition-colors ${tagActive === tag ? 'bg-secondary-normal text-white' : ''}`}
+            className={`flex items-center justify-center bg-background-normal rounded-lg px-8 py-2 text-[14px] font-medium
+          hover:bg-secondary-normal hover:text-white text-secondary-normal cursor-pointer transition-colors 
+              ${tagActive === tag ? 'bg-secondary-normal text-white' : ''}`}
             onClick={() => handleTagClick(tag)}
             key={tag}
           >
@@ -49,8 +51,8 @@ export function ListProductLowStock({
         ))}
       </div>
 
-      <div className="flex flex-col flex-1 gap-4 overflow-y-auto pr-1">
-        {filteredProducts.map(product => {
+      <div className="flex flex-col flex-1 gap-4">
+        {filteredProducts.length > 0 ? (filteredProducts.map(product => {
           const stock = product.variants.reduce(
             (total, variant) => total + variant.stock,
             0,
@@ -70,7 +72,9 @@ export function ListProductLowStock({
               variants={lowStockVariant}
             />
           );
-        })}
+        })) : (
+          <LowStockEmptyState />
+        )}
       </div>
     </>
   );

@@ -13,7 +13,7 @@ export default async function Products() {
 
   if(!user) return redirect('/login');
 
-  const products = await findAllProductsChached();
+  const products = await findAllProductsChached(user.id);
 
   return (
     <CardMain>

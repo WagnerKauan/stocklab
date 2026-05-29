@@ -3,7 +3,7 @@
 import { InputWithLabel } from '@/components/ui/input';
 import { ErrorsInput } from '@/models/global/global';
 import { useState } from 'react';
-import { FiCheck } from 'react-icons/fi';
+import { FiCheck, FiEye, FiEyeOff } from 'react-icons/fi';
 import { LuChrome, LuShieldCheck } from 'react-icons/lu';
 
 export function ProfileSecurity() {
@@ -23,6 +23,18 @@ export function ProfileSecurity() {
   function handleSubmit(e: React.ChangeEvent<HTMLFormElement>) {
     e.preventDefault();
   }
+
+   function eyeButton(show: boolean, toggle: () => void) {
+    return (
+      <button
+        type="button"
+        onClick={toggle}
+        className="text-[#9ca3af] hover:text-[#6b7280] transition-colors cursor-pointer"
+      >
+      {show ? <FiEyeOff size={15} /> : <FiEye size={15} />}
+    </button> 
+  );
+}
 
   return (
     <section className="mt-8">
