@@ -30,6 +30,7 @@ model User {
   email  String @unique
   password String?
   image String?
+  imageKey String?
   createdAt DateTime @default(now())
 
   userSettings UserSettings?

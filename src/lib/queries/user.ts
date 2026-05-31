@@ -1,4 +1,4 @@
-import { CreateAccountParams, FindAccountById } from "@/models/queries/queries"
+import { CreateAccountParams, FindAccountById, updateAvatarProps } from "@/models/queries/queries"
 import { UserData } from "@/models/user/user-model"
 import { userRepository } from "@/repository/user"
 
@@ -22,8 +22,6 @@ export const findUserByEmail = async (email: string) => {
 export const createUser = async (data: UserData) => {
   return await userRepository.create(data)
 } 
-
-
 
 
 export const findAccountById = async ({provider, providerAccountId}: FindAccountById) => {

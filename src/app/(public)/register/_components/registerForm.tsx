@@ -7,6 +7,7 @@ import { sanitizeUser } from '@/utils/sanitizeUser';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { useState } from 'react';
+import { toast } from 'react-toastify';
 
 type ErrorsInput = {
   message: string;
@@ -58,7 +59,7 @@ export function RegisterForm() {
     const result = await actionCreateUser(sanitizedUser);
 
     if (result.code === 500)
-      return alert(
+      return toast.error(
         'Ocorreu um erro ao criar a sua conta, tente novamente mais tarde.',
       );
 
@@ -67,8 +68,11 @@ export function RegisterForm() {
       return;
     }
 
-    alert(`Conta criada com sucesso! ${user.name}, seja bem-vindo!`);
-    if (result.status) return redirect('/dashboard');
+    if (result.status) {
+      resetState();
+      toast.success(`Conta criada com sucesso!`);
+      return redirect('/dashboard');
+    }
   }
 
   function handleBlur(field: string, value: string) {
@@ -93,16 +97,26 @@ export function RegisterForm() {
 
   function handleGoogleLogin(e: React.MouseEvent<HTMLButtonElement>) {
     e.preventDefault();
-    console.log('Login com Google');
     try {
       const url = process.env.NEXT_PUBLIC_URL || 'http://localhost:3000';
+      toast.success('Seja bem vindo!');
       window.location.href = `${url}/api/auth/google`;
     } catch (error) {
       console.error('Erro ao fazer login com o Google:', error);
-      alert(
+      toast.error(
         'Ocorreu um erro ao fazer login com o Google, tente novamente mais tarde.',
       );
     }
+  }
+
+  function resetState() {
+    setUser({
+      name: '',
+      email: '',
+      password: '',
+      image: '',
+    });
+    setErrors([]);
   }
 
   return (

@@ -8,6 +8,7 @@ import { validateLogin } from '@/validation/user';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { useState } from 'react';
+import { toast } from 'react-toastify';
 
 type ErrorsInput = {
   message: string;
@@ -57,7 +58,7 @@ export function LoginForm() {
     const result = await actionAuthUser(data);
 
     if (result.code === 500) {
-      alert('Ocorreu um erro ao fazer login, tente novamente mais tarde.');
+      toast.error('Ocorreu um erro ao fazer login, tente novamente mais tarde.');
       setLoading(false);
       return;
     }
@@ -65,7 +66,7 @@ export function LoginForm() {
     if (result.errors.length > 0) {
       result.errors.forEach(err => {
         if (err.field === 'secret') {
-          alert(err.message);
+          toast.error(err.message);
         } else {
           setErrors(prev => [...prev, err]);
         }
@@ -75,8 +76,9 @@ export function LoginForm() {
       return;
     }
 
+    resetState();
     setLoading(false);
-
+    toast.success('Bem-vindo de volta!');
     return redirect('/dashboard');
   }
 
@@ -103,13 +105,22 @@ export function LoginForm() {
    function handleGoogleLogin() {
     try {
       const url = process.env.NEXT_PUBLIC_URL || 'http://localhost:3000';
+      toast.success('Bem-vindo de volta!');
       window.location.href = `${url}/api/auth/google`;
     } catch (error) {
       console.error('Erro ao fazer login com o Google:', error);
-      alert(
+      toast.error(
         'Ocorreu um erro ao fazer login com o Google, tente novamente mais tarde.',
       );
     }
+  }
+
+  function resetState() {
+    setUser({
+      email: '',
+      password: '',
+    });
+    setErrors([]);
   }
 
   return (

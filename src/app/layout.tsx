@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Figtree, } from "next/font/google";
+import { ToastContainer } from 'react-toastify';
 import "./globals.css";
 
 
@@ -23,7 +24,10 @@ export default function RootLayout({
       lang="pt-BR"
       className={`${figTree.className} min-h-dvh h-full antialiased`}
     >
-      <body className="min-h-dvh h-full bg-background-normal">{children}</body>
+      <body className="min-h-dvh h-full bg-background-normal">
+        <ToastContainer position="top-right" autoClose={3000} />
+        {children}
+      </body>
     </html>
   );
 }

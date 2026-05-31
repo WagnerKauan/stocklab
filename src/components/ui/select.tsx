@@ -32,9 +32,6 @@ export function SelectWithLabel({
         value={value}
         onBlur={e => handleOnBlur(field, e.target.value)}
       >
-        <option value="" disabled>
-          Selecione uma opção
-        </option>
         {options.map(option => (
           <option key={option.value} value={option.value}>
             {option.label}

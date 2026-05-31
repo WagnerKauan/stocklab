@@ -5,16 +5,34 @@ import { ErrorsInput } from '@/models/global/global';
 import Image from 'next/image';
 import { useState } from 'react';
 import { FiCamera } from 'react-icons/fi';
+import { toast } from 'react-toastify';
+import imageCompression from 'browser-image-compression';
+import { useUploadThing } from '@/lib/uploadthing';
+import { actionUpdateAvatar } from '@/actions/profile/action-update-Avatar';
+import { RiLoader2Fill } from 'react-icons/ri';
+import { userSchema } from '@/schemas/user/user.schema';
+import { actionUpdateName } from '@/actions/profile/action-update-name';
+import { AiOutlineLoading3Quarters } from 'react-icons/ai';
 
 type ProfileInformationProps = {
   name: string;
   email: string;
   image: string | null;
-}
+};
 
-export function ProfileSettings({ name, email, image }: ProfileInformationProps) {
+export function ProfileSettings({
+  name,
+  email,
+  image,
+}: ProfileInformationProps) {
   const [updateName, setUpdateName] = useState(name);
   const [errors, setErrors] = useState<ErrorsInput[]>([]);
+  const [loadingUpdateAvatar, setLoadingUpdateAvatar] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const { startUpload, } = useUploadThing('userAvatar');
+
+  const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+  const MAX_SIZE = 4 * 1024 * 1024;
 
   function handleChange(field: string, value: string) {
     if (field === 'name') {
@@ -22,13 +40,112 @@ export function ProfileSettings({ name, email, image }: ProfileInformationProps)
     }
   }
 
-  function handleOnBlur(field: string, value: string) {}
+  async function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+
+    if (!file) {
+      return;
+    }
+    setLoadingUpdateAvatar(true);
+
+    if (file.type && !validTypes.includes(file.type)) {
+      toast.error('Formato de arquivo inválido, tente novamente');
+      setLoadingUpdateAvatar(false);
+      return;
+    }
+
+    const options = {
+      maxSizeMB: 1,
+      maxWidthOrHeight: 1920,
+      useWebWorker: true,
+      fileType: 'image/webp',
+    };
+    const compressedFile = await imageCompression(file, options);
+
+    if (compressedFile.size > MAX_SIZE) {
+      toast.error('Arquivo muito grande, tente novamente');
+      setLoadingUpdateAvatar(false);
+      return;
+    }
+
+    try {
+      const response = await startUpload([compressedFile]);
+
+      if (response && response[0].ufsUrl) {
+        const imageUrl = response[0].ufsUrl;
+        const imageKey = response[0].key;
+        const result = await actionUpdateAvatar({
+          newImageUrl: imageUrl,
+          newImageKey: imageKey,
+        });
+        if (result.message) {
+          toast.success(result.message);
+          setLoadingUpdateAvatar(false);
+        } else {
+          toast.error(result.error);
+          setLoadingUpdateAvatar(false);
+        }
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error('Erro ao editar a imagem');
+      setLoadingUpdateAvatar(false);
+      return;
+    }
+  }
+
+  async function handleUpdateName() {
+    setLoading(true);
+
+    const errors = userSchema.shape.name.safeParse(updateName);
+
+    if (!errors.success) {
+      errors.error.issues.forEach(issue => {
+        setErrors(prev => [
+          ...prev,
+          {
+            message: issue.message,
+            field: 'name',
+          },
+        ]);
+      });
+      setLoading(false);
+      return;
+    }
+
+    const result = await actionUpdateName({ name: updateName });
+
+    if (result.errors) {
+      
+      result.errors.forEach(error => {
+        if (error.field === 'secret') {
+          toast.error(error.message);
+        } else {
+          setErrors(prev => [
+            ...prev,
+            { message: error.message, field: error.field },
+          ]);
+        }
+      });
+
+      setLoading(false);
+      return;
+    }
+
+    if (result.status && result.message) {
+      toast.success(result.message);
+      setLoading(false);
+      return;
+    }
+  }
 
   return (
     <section>
       {/* Title section */}
-      <div className='mb-6'>
-        <h5 className='text-secondary-dark text-lg font-medium'>Informações do perfil</h5>
+      <div className="mb-6">
+        <h5 className="text-secondary-dark text-lg font-medium">
+          Informações do perfil
+        </h5>
         <p className="text-secondary-light text-sm">
           Atualize seus dados pessoais e sua foto de perfil.
         </p>
@@ -43,36 +160,49 @@ export function ProfileSettings({ name, email, image }: ProfileInformationProps)
               alt="Avatar"
               width={100}
               height={100}
-              className="object-cover "
+              className="object-cover w-full h-full"
             />
 
             <label
               htmlFor="avatar-upload"
-              className="absolute inset-0 flex items-center justify-center rounded-lg 
-             bg-secondary-dark/50 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+              className={`absolute inset-0 flex items-center justify-center rounded-lg ${loadingUpdateAvatar && 'opacity-100'}
+             bg-secondary-dark/50 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer`}
             >
-              <FiCamera size={16} className="text-white" />
+              {loadingUpdateAvatar ? (
+                <RiLoader2Fill size={24} className="animate-spin text-white" />
+              ) : (
+                <FiCamera size={16} color="#FFF" />
+              )}
             </label>
             <input
               id="avatar-upload"
               type="file"
               accept="image/*"
               className="hidden"
+              onChange={handleFileChange}
+              disabled={loadingUpdateAvatar}
             />
           </div>
 
-          <button className="cursor-pointer ">
-            <span
-              className="text-sm text-secondary-light hover:underline 
-                hover:text-secondary-normal transition-colors"
-            >
-              Alterar foto
-            </span>
-          </button>
+          <input
+            id="avatar-upload-button"
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleFileChange}
+            disabled={loadingUpdateAvatar}
+          />
+          <label
+            htmlFor="avatar-upload-button"
+            className="text-sm text-secondary-normal cursor-pointer 
+            hover:text-secondary-light hover:underline"
+          >
+            Alterar foto
+          </label>
         </div>
 
         {/* Campos do perfil */}
-        <div className="flex flex-col gap-4 w-full">
+        <div className="flex flex-col gap-5 w-full">
           <div className="flex gap-4">
             <div className="relative flex-1">
               <InputWithLabel
@@ -82,7 +212,6 @@ export function ProfileSettings({ name, email, image }: ProfileInformationProps)
                 field="name"
                 handleChange={handleChange}
                 value={updateName}
-                handleOnBlur={handleOnBlur}
               />
             </div>
 
@@ -104,15 +233,21 @@ export function ProfileSettings({ name, email, image }: ProfileInformationProps)
             </div>
           </div>
 
-          <div className='flex items-center gap-4'>
+          <div className="flex items-center gap-4">
             <button
               className={`px-4 py-2 rounded-lg bg-primary-normal text-white 
-                  hover:bg-primary-hover transition-colors font-semibold text-sm cursor-pointer`}
+                  hover:bg-primary-hover transition-colors font-semibold text-sm cursor-pointer w-full flex items-center justify-center max-w-40`}
+              onClick={handleUpdateName}
+              disabled={loading}
             >
-              Salvar alterações
+              {loading ? (
+                <AiOutlineLoading3Quarters size={17} className="animate-spin text-white" />
+              ) : ('Salvar alterações')}
             </button>
 
-            <span className='text-sm text-secondary-light block'>As alterações são salvas na sua conta.</span>
+            <span className="text-sm text-secondary-light block">
+              As alterações são salvas na sua conta.
+            </span>
           </div>
         </div>
       </div>

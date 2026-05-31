@@ -135,7 +135,6 @@ export function ProfilePreferences() {
           <Switch
             size="default"
             className="cursor-pointer data-[state=checked]:bg-primary-normal data-[state=unchecked]:bg-zinc-200"
-            defaultChecked
           />
         </div>
 
@@ -161,6 +160,7 @@ export function ProfilePreferences() {
           <Switch
             size="default"
             className="cursor-pointer data-[state=checked]:bg-primary-normal data-[state=unchecked]:bg-zinc-200"
+            defaultChecked
           />
         </div>
 

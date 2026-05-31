@@ -43,4 +43,5 @@ export class JsonProductRepository implements ProductRepository {
   update(product: ProductModel): Promise<boolean> {
     throw new Error('Method not implemented.');
   }
+  
 }

@@ -30,7 +30,7 @@ export async function actionUpdateProduct(data: ProductModel) {
     }
   }
 
-  const productDB = await findProductByIdChached(productData.id);
+  const productDB = await findProductByIdChached(productData.id, user.id);
 
   if(!productDB) {
     return {
@@ -67,5 +67,6 @@ export async function actionUpdateProduct(data: ProductModel) {
     status: resultUpdateProduct && resultSyncVariants,
     errors: [],
     code: resultUpdateProduct && resultSyncVariants ? 200 : 500,
+    data: resultUpdateProduct
   }
 }

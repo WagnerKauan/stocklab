@@ -1,6 +1,7 @@
 import { SyncVariants, ProductModel } from '@/models/product/product-model';
 import { ProductRepository } from './product-repository';
 import { prisma } from '@/lib/prisma';
+import { Product } from '../../../generated/prisma/client';
 
 type ProductData = Omit<ProductModel, 'id'>;
 
@@ -9,7 +10,7 @@ export class SqliteProductRepository implements ProductRepository {
     const products = await prisma.product.findMany({
       where: {
         userId: userId,
-      },  
+      },
       include: {
         variants: true,
       },
@@ -32,7 +33,9 @@ export class SqliteProductRepository implements ProductRepository {
     return product;
   }
 
-  async create(data: ProductData & { userId: string }): Promise<boolean> {
+  async create(
+    data: ProductData & { userId: string },
+  ): Promise<Product | null> {
     const { variants, userId, ...productData } = data;
 
     try {
@@ -58,14 +61,14 @@ export class SqliteProductRepository implements ProductRepository {
         },
       });
 
-      return !!result;
+      return result;
     } catch (error) {
       console.error(error);
-      return false;
+      return null;
     }
   }
 
-  async update(product: ProductModel): Promise<boolean> {
+  async update(product: ProductModel): Promise<Product | null> {
     const { variants, id, ...productData } = product;
 
     try {
@@ -77,10 +80,10 @@ export class SqliteProductRepository implements ProductRepository {
           ...productData,
         },
       });
-      return !!result;
+      return result;
     } catch (error) {
       console.error(error);
-      return false;
+      return null;
     }
   }
 

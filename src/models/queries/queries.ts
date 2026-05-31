@@ -9,3 +9,10 @@ export type CreateAccountParams = {
   provider: string;
   providerAccountId: string;
 }
+
+
+export type updateAvatarProps = {
+  userId: string,
+  imageKey: string,
+  imageUrl: string
+}

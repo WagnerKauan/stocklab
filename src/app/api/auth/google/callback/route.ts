@@ -14,6 +14,8 @@ export async function GET(request: NextRequest) {
 
     const code = searchParams.get('code');
 
+    const state = searchParams.get('mode');
+
     if (!code) {
       return NextResponse.redirect(`${process.env.NEXT_PUBLIC_URL}/login`);
     }
@@ -52,7 +54,7 @@ export async function GET(request: NextRequest) {
 
     const googleUser = await userResponse.json();
 
-    if (!googleUser.email) {
+    if (!googleUser.id) {
       return NextResponse.redirect(`${process.env.NEXT_PUBLIC_URL}/login`);
     }
 
@@ -60,6 +62,12 @@ export async function GET(request: NextRequest) {
       provider: 'google',
       providerAccountId: googleUser.id,
     });
+
+    if(state === 'link') {
+      if(!account) {
+        
+      }
+    }
 
     const existEmail = await findUserByEmail(googleUser.email);
 

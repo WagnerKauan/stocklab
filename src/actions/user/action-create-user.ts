@@ -37,7 +37,7 @@ export async function actionCreateUser(data: UserData) {
 
   const sanitazedUser = sanitizeUser(data, 'DB')
 
-  const hashedPassword = await createHash(data.password)
+  const hashedPassword = await createHash(data.password!)
 
   const user = await createUser({
     ...sanitazedUser,

@@ -1,13 +1,24 @@
 'use client';
 
+import { actionUpdatePassword } from '@/actions/profile/action-update-Password';
 import { InputWithLabel } from '@/components/ui/input';
 import { ErrorsInput } from '@/models/global/global';
+import { updatePasswordSchema } from '@/schemas/user/update-password-schema';
 import { useState } from 'react';
-import { FiCheck, FiEye, FiEyeOff } from 'react-icons/fi';
 import { LuChrome, LuShieldCheck } from 'react-icons/lu';
+import { toast } from 'react-toastify';
+import { AiOutlineLoading3Quarters } from 'react-icons/ai';
+import { FiCheck } from 'react-icons/fi';
 
-export function ProfileSecurity() {
-  const [managePassword, setManagePassword] = useState({
+type MenagePassword = {
+  currentPassword: string | null;
+  newPassword: string;
+  confirmPassword: string;
+};
+
+export function ProfileSecurity({ hasPassword }: { hasPassword: boolean }) {
+  const [loading, setLoading] = useState(false);
+  const [managePassword, setManagePassword] = useState<MenagePassword>({
     currentPassword: '',
     newPassword: '',
     confirmPassword: '',
@@ -18,23 +29,58 @@ export function ProfileSecurity() {
     setManagePassword(prev => ({ ...prev, [field]: value }));
   }
 
-  function handleOnBlur(field: string, value: string) {}
-
-  function handleSubmit(e: React.ChangeEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.ChangeEvent<HTMLFormElement>) {
     e.preventDefault();
+    setLoading(true);
+
+    const errors = updatePasswordSchema.safeParse(managePassword);
+
+    if (!errors.success) {
+      errors.error.issues.forEach(issue => {
+        setErrors(prev => [
+          ...prev,
+          { message: issue.message, field: issue.path[0].toString() },
+        ]);
+      });
+      setLoading(false);
+      return;
+    }
+
+    const result = await actionUpdatePassword({ ...managePassword });
+
+    if (result.errors && result.errors.length > 0) {
+      result.errors.forEach(error => {
+        if (error.field === 'secret') {
+          toast.error(error.message);
+        } else {
+          setErrors(prev => [
+            ...prev,
+            { message: error.message, field: error.field },
+          ]);
+        }
+      });
+
+      setLoading(false);
+      return;
+    }
+
+    if (result.message) {
+      toast.success(result.message);
+      setLoading(false);
+      resetState();
+      return;
+    }
   }
 
-   function eyeButton(show: boolean, toggle: () => void) {
-    return (
-      <button
-        type="button"
-        onClick={toggle}
-        className="text-[#9ca3af] hover:text-[#6b7280] transition-colors cursor-pointer"
-      >
-      {show ? <FiEyeOff size={15} /> : <FiEye size={15} />}
-    </button> 
-  );
-}
+
+  function resetState() {
+    setManagePassword({
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: '',
+    });
+    setErrors([]);
+  }
 
   return (
     <section className="mt-8">
@@ -51,32 +97,32 @@ export function ProfileSecurity() {
         <div className="space-y-4">
           <span className="text-sm text-secondary-dark flex items-center gap-1">
             <LuShieldCheck size={14} className="text-secondary-light" />
-            alterar a senha
+            {hasPassword ? 'Alterar senha' : 'Criar senha'}
           </span>
 
           <form className="space-y-4" onSubmit={handleSubmit}>
-            <div className="relative">
-              <InputWithLabel
-                type="password"
-                label="Senha atual"
-                placeholder="••••••••"
-                field={'currentPassword'}
-                value={managePassword.currentPassword}
-                handleChange={handleChange}
-                handleOnBlur={handleOnBlur}
-                errors={errors}
-              />
-            </div>
+            {hasPassword && (
+              <div className="relative">
+                <InputWithLabel
+                  type="password"
+                  label="Senha atual"
+                  placeholder="••••••••"
+                  field={'currentPassword'}
+                  value={managePassword.currentPassword || ''}
+                  handleChange={handleChange}
+                  errors={errors}
+                />
+              </div>
+            )}
 
             <div className="relative">
               <InputWithLabel
                 type="password"
-                label="Nova senha"
+                label={hasPassword ? 'Nova senha' : 'Senha'}
                 placeholder="Min. 8 caracteres"
                 field={'newPassword'}
                 value={managePassword.newPassword}
                 handleChange={handleChange}
-                handleOnBlur={handleOnBlur}
                 errors={errors}
               />
             </div>
@@ -84,21 +130,28 @@ export function ProfileSecurity() {
             <div className="relative">
               <InputWithLabel
                 type="password"
-                label="Confirmar nova senha"
+                label={
+                  hasPassword ? 'Confirme a nova senha' : 'Confirme a senha'
+                }
                 placeholder="Re-digite a nova senha"
                 field={'confirmPassword'}
                 value={managePassword.confirmPassword}
                 handleChange={handleChange}
-                handleOnBlur={handleOnBlur}
                 errors={errors}
               />
             </div>
 
             <button
+            type='submit'
               className={`px-4 py-2 rounded-lg bg-secondary-dark text-white 
-                  hover:bg-secondary-dark/90 transition-colors font-semibold cursor-pointer text-sm`}
+                  hover:bg-secondary-dark/90 transition-colors font-semibold cursor-pointer text-sm flex items-center`}
             >
-              Atualizar senha
+              {hasPassword ? 'Alterar senha' : 'Criar senha'}
+              {loading && (
+                <span className="ml-2">
+                  <AiOutlineLoading3Quarters size={16} className="animate-spin text-white" />
+                </span>
+              )}
             </button>
           </form>
         </div>
@@ -145,7 +198,7 @@ export function ProfileSecurity() {
 
           <div className="bg-blue-50 p-4 rounded-lg mt-4 border border-blue-300 flex gap-2">
             <LuShieldCheck size={20} className="text-blue-600" />
-            <p className='text-sm text-blue-600'>
+            <p className="text-sm text-blue-600">
               Use uma senha forte e habilite a autenticação de dois fatores para
               manter sua conta segura.
             </p>

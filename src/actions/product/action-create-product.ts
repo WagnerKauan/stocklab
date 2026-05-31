@@ -47,5 +47,6 @@ export async function actionCreateProduct(data: ProductData) {
     status: true,
     errors: [],
     code: 200,
+    data: result,
   };
 }

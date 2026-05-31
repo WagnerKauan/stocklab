@@ -10,6 +10,6 @@ export const userSchema = z.object({
     .max(100, 'O email deve ter no máximo 100 caracteres'),
   password: z
     .string()
-    .min(1, 'A senha é obrigatória')
+    .min(6, 'A senha precisa ter pelo menos 6 caracteres')
     .max(100, 'A senha deve ter no máximo 100 caracteres'),
 });

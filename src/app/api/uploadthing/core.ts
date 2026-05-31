@@ -36,18 +36,17 @@ export const ourFileRouter = {
   }),
 
 
-  //Pode ter varias imagens
-  // userAvatar: f({
-  //   image: {
-  //     maxFileSize: '4MB',
-  //     maxFileCount: 1,
-  //   },
-  // }).onUploadComplete(async ({ file }) => {
+  userAvatar: f({
+    image: {
+      maxFileSize: '4MB',
+      maxFileCount: 1,
+    },
+  }).onUploadComplete(async ({ file }) => {
 
-  //   return ({
-  //     userAvatar: file.ufsUrl,
-  // })
-  // })
+    return ({
+      userAvatar: file.ufsUrl,
+  })
+  })
 } satisfies FileRouter;
 
 export type OurFileRouter = typeof ourFileRouter;

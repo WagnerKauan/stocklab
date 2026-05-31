@@ -15,6 +15,8 @@ import { actionUpdateProduct } from '@/actions/product/action-update-product';
 import { useUploadThing } from '@/lib/uploadthing';
 import { actionDeleteImage } from '@/actions/product/action-delete-image';
 import { ImSpinner2 } from 'react-icons/im';
+import { toast } from 'react-toastify';
+import { useRouter } from 'next/navigation';
 
 type FormProductProps = {
   initialData?: ProductModel;
@@ -40,6 +42,8 @@ export function FormProduct({ initialData }: FormProductProps) {
     productImage: initialData?.productImage || '',
     imageKey: initialData?.imageKey || '',
   });
+
+  const router = useRouter();
 
   const [errors, setErrors] = useState<ErrorInput[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -99,6 +103,7 @@ export function FormProduct({ initialData }: FormProductProps) {
   }
 
   async function handleSubmit() {
+    toast.dismiss();
     setIsLoading(true);
     const data = {
       ...product,
@@ -144,7 +149,7 @@ export function FormProduct({ initialData }: FormProductProps) {
     const response = await actionCreateProduct(data);
 
     if (response.code === 500) {
-      alert('Erro desconhecido ao criar o produto');
+      toast.error('Erro desconhecido ao criar o produto');
       setIsLoading(false);
       return;
     }
@@ -155,14 +160,23 @@ export function FormProduct({ initialData }: FormProductProps) {
       return;
     }
 
-    alert('Produto criado');
+    if(!response.data) {
+      toast.error('Erro ao criar o produto');
+      setIsLoading(false);
+      return;
+    }
+
+    toast.success('O produto foi criado com sucesso');
 
     resetState();
     setIsLoading(false);
+
+    router.push(`/products/${response.data.id}`);
   }
   async function handleEditProduct() {
+    toast.dismiss();
     if (!initialData) {
-      alert('Erro ao editar o produto');
+      toast.error('Erro ao editar o produto');
       setIsLoading(false);
       return;
     }
@@ -188,7 +202,7 @@ export function FormProduct({ initialData }: FormProductProps) {
         }
       } catch (error) {
         console.error(error);
-        alert('erro ao editar a imagem');
+        toast.error('erro ao editar a imagem');
       }
     }
 
@@ -196,7 +210,7 @@ export function FormProduct({ initialData }: FormProductProps) {
 
     switch (response.code) {
       case 500:
-        alert('Erro desconhecido ao editar o produto');
+        toast.error('Erro desconhecido ao editar o produto');
         setIsLoading(false);
         return;
       case 400:
@@ -204,14 +218,22 @@ export function FormProduct({ initialData }: FormProductProps) {
         setIsLoading(false);
         return;
       case 404:
-        alert('Produto nao encontrado');
+        toast.error('Produto não encontrado');
         setIsLoading(false);
         return;
     }
 
-    alert('Produto editado');
+     if(!response.data) {
+      toast.error('Erro ao criar o produto');
+      setIsLoading(false);
+      return;
+    }
+
+    toast.success('O produto foi editado com sucesso');
     resetState();
     setIsLoading(false);
+
+    router.push(`/products/${response.data.id}`);
   }
 
   return (

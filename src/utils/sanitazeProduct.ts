@@ -58,12 +58,7 @@ const sanitizers = {
     },
 
     category: (v: string) => {
-      v.trim()
-      let textFormat = capitalize(v);
-      v = textFormat
-      if(textFormat === 'Calcados') v = 'Calçados';
-      if(textFormat === 'Acessorios') v = 'Acessórios';
-
+      v.trim().replace(/\s+/g,' ');
       return v;
     },
 
