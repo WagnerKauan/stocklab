@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 //Essa rota faz o redirecionamento para a tela de login do google quando o usuário clicar no botão de
 // login com google
 
-export async function GET({ request }: { request: Request }) {
+export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
 
   const mode = searchParams.get('mode') || 'login';

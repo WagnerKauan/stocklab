@@ -31,7 +31,7 @@ export class SqliteUserRepository implements UserRepository {
     });
   }
 
-  async findAccountByid({provider, providerAccountId}: FindAccountById): Promise<Account | null> {
+  async findAccountByid({provider, providerAccountId,}: FindAccountById): Promise<Account | null> {
     return await prisma.account.findUnique({
       where: {
        provider_providerAccountId: {
@@ -42,13 +42,39 @@ export class SqliteUserRepository implements UserRepository {
     })
   }
 
-  async createAccount({userId, provider, providerAccountId}: CreateAccountParams): Promise<Account> {
+  async findAccountByUserId(userId: string): Promise<Account | null> {
+    return await prisma.account.findFirst({
+      where: {
+        userId: userId
+      }
+    })
+  }
+
+  async createAccount({userId, provider, providerAccountId, googleEmail}: CreateAccountParams): Promise<Account> {
     return await prisma.account.create({
       data: {
         userId: userId,
         provider: provider,
         providerAccountId: providerAccountId,
+        googleEmail: googleEmail
       }
     })
+  }
+
+  async disconnectAccount({ provider, providerAccountId }: FindAccountById): Promise<boolean> {
+    try {
+      await prisma.account.delete({
+        where: {
+          provider_providerAccountId: {
+            provider: provider,
+            providerAccountId: providerAccountId,
+          }
+        }
+      })
+      return true
+    }catch (error) {
+      console.error(error);
+      return false
+    } 
   }
 }

@@ -5,7 +5,7 @@ import { InputWithLabel } from '@/components/ui/input';
 import { userSchema } from '@/schemas/user/user.schema';
 import { sanitizeUser } from '@/utils/sanitizeUser';
 import Link from 'next/link';
-import { redirect } from 'next/navigation';
+import { redirect, } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 

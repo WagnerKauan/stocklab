@@ -6,8 +6,10 @@ import {
 } from '@/settings/variablesGlobal';
 import { CardProductLowStock } from './cardProductLowStock';
 import { ProductModel } from '@/models/product/product-model';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { LowStockEmptyState } from './lowStockEmptyState';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { toast } from 'react-toastify';
 
 export function ListProductLowStock({
   products,
@@ -18,12 +20,15 @@ export function ListProductLowStock({
   const [filteredProducts, setFilteredProducts] =
     useState<ProductModel[]>(products);
 
-  const tags = products.reduce((acc, product) => {
-    if (!acc.includes(product.category)) {
-      acc.push(product.category);
-    }
-    return acc;
-  }, ['Todas']);
+  const tags = products.reduce(
+    (acc, product) => {
+      if (!acc.includes(product.category)) {
+        acc.push(product.category);
+      }
+      return acc;
+    },
+    ['Todas'],
+  );
 
   function handleTagClick(tag: string) {
     // Lógica para filtrar os produtos com base na tag selecionada
@@ -34,6 +39,16 @@ export function ListProductLowStock({
       ),
     );
   }
+  const router = useRouter();
+  const pathname = usePathname();
+  const success = useSearchParams().get('success');
+
+  useEffect(() => {
+    if (success === 'authenticated') {
+      toast.success('Bem-vindo!');
+      router.replace(pathname);
+    }
+  }, [success]);
 
   return (
     <>
@@ -52,27 +67,31 @@ export function ListProductLowStock({
       </div>
 
       <div className="flex flex-col flex-1 gap-4">
-        {filteredProducts.length > 0 ? (filteredProducts.map(product => {
-          const stock = product.variants.reduce(
-            (total, variant) => total + variant.stock,
-            0,
-          );
+        {filteredProducts.length > 0 ? (
+          filteredProducts.map(product => {
+            const stock = product.variants.reduce(
+              (total, variant) => total + variant.stock,
+              0,
+            );
 
-          const lowStockVariant = product.variants.filter(
-            variant => variant.stock <= MINIMUM_STOCK_VARIANTS,
-          );
+            const lowStockVariant = product.variants.filter(
+              variant => variant.stock <= MINIMUM_STOCK_VARIANTS,
+            );
 
-          return (
-            <CardProductLowStock
-              key={product.id}
-              name={product.name}
-              image={product.productImage || '/product/placeHolderProduct.png'}
-              stock={stock}
-              minimumStock={MINIMUM_STOCK_PRODUCT}
-              variants={lowStockVariant}
-            />
-          );
-        })) : (
+            return (
+              <CardProductLowStock
+                key={product.id}
+                name={product.name}
+                image={
+                  product.productImage || '/product/placeHolderProduct.png'
+                }
+                stock={stock}
+                minimumStock={MINIMUM_STOCK_PRODUCT}
+                variants={lowStockVariant}
+              />
+            );
+          })
+        ) : (
           <LowStockEmptyState />
         )}
       </div>

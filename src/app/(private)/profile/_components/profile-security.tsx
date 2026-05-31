@@ -4,11 +4,14 @@ import { actionUpdatePassword } from '@/actions/profile/action-update-Password';
 import { InputWithLabel } from '@/components/ui/input';
 import { ErrorsInput } from '@/models/global/global';
 import { updatePasswordSchema } from '@/schemas/user/update-password-schema';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { LuChrome, LuShieldCheck } from 'react-icons/lu';
 import { toast } from 'react-toastify';
 import { AiOutlineLoading3Quarters } from 'react-icons/ai';
 import { FiCheck } from 'react-icons/fi';
+import { Account } from '../../../../../generated/prisma/client';
+import { actionDisconnectAccount } from '@/actions/profile/action-disconnect-account';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 type MenagePassword = {
   currentPassword: string | null;
@@ -16,14 +19,27 @@ type MenagePassword = {
   confirmPassword: string;
 };
 
-export function ProfileSecurity({ hasPassword }: { hasPassword: boolean }) {
+type ProfileSecurityProps = {
+  hasPassword: boolean;
+  account: Account | null;
+};
+
+export function ProfileSecurity({
+  hasPassword,
+  account,
+}: ProfileSecurityProps) {
   const [loading, setLoading] = useState(false);
+  const [loadingAccount, setLoadingAccount] = useState(false);
   const [managePassword, setManagePassword] = useState<MenagePassword>({
     currentPassword: '',
     newPassword: '',
     confirmPassword: '',
   });
+  const successParam = useSearchParams().get('success');
+  const errosParam = useSearchParams().get('error');
   const [errors, setErrors] = useState<ErrorsInput[]>([]);
+  const router = useRouter();
+  const pathname = usePathname();
 
   function handleChange(field: string, value: string) {
     setManagePassword(prev => ({ ...prev, [field]: value }));
@@ -72,6 +88,33 @@ export function ProfileSecurity({ hasPassword }: { hasPassword: boolean }) {
     }
   }
 
+  async function handleAccount() {
+    setLoadingAccount(true);
+    if (account) {
+      const result = await actionDisconnectAccount(account);
+
+      if (result && result.message) {
+        toast.success(result.message);
+        setLoadingAccount(false);
+        return;
+      }
+      toast.error(result.error);
+      setLoadingAccount(false);
+      return;
+    }
+
+    try {
+      const url = process.env.NEXT_PUBLIC_URL || 'http://localhost:3000';
+      window.location.href = `${url}/api/auth/google?mode=link`;
+      setLoadingAccount(false);
+    } catch (error) {
+      console.error('Erro ao conectar a conta', error);
+      toast.error(
+        'Ocorreu um erro ao tentar conectar a sua conta com o Google, tente novamente mais tarde.',
+      );
+      setLoadingAccount(false);
+    }
+  }
 
   function resetState() {
     setManagePassword({
@@ -81,6 +124,22 @@ export function ProfileSecurity({ hasPassword }: { hasPassword: boolean }) {
     });
     setErrors([]);
   }
+  useEffect(() => {
+    if (successParam === 'google-linked') {
+      toast.success('Conta conectada com sucesso!');
+      router.replace(pathname);
+    }
+
+    if (errosParam === 'google-already-linked') {
+      toast.error('Essa conta já está conectada a uma outra conta.');
+      router.replace(pathname);
+    }
+  }, [successParam, errosParam]);
+
+  const conectedStyle = {
+    conected: 'bg-green-50 text-green-600 border-green-600',
+    disconected: 'bg-red-50 text-red-600 border-red-600',
+  };
 
   return (
     <section className="mt-8">
@@ -142,14 +201,17 @@ export function ProfileSecurity({ hasPassword }: { hasPassword: boolean }) {
             </div>
 
             <button
-            type='submit'
+              type="submit"
               className={`px-4 py-2 rounded-lg bg-secondary-dark text-white 
                   hover:bg-secondary-dark/90 transition-colors font-semibold cursor-pointer text-sm flex items-center`}
             >
               {hasPassword ? 'Alterar senha' : 'Criar senha'}
               {loading && (
                 <span className="ml-2">
-                  <AiOutlineLoading3Quarters size={16} className="animate-spin text-white" />
+                  <AiOutlineLoading3Quarters
+                    size={16}
+                    className="animate-spin text-white"
+                  />
                 </span>
               )}
             </button>
@@ -175,24 +237,42 @@ export function ProfileSecurity({ hasPassword }: { hasPassword: boolean }) {
                 </div>
 
                 <div className="flex flex-col">
-                  <span className="text-secondary-dark text-sm">Google</span>
+                  <span className="text-secondary-dark text-sm">
+                    {account?.provider || 'Google'}
+                  </span>
                   <span className="text-secondary-light text-sm">
-                    kauanw@gmail.com
+                    {account?.googleEmail || 'Não conectado'}
                   </span>
                 </div>
               </div>
 
-              <span className="bg-green-50 text-green-600 px-2 py-1 rounded-full flex items-center gap-1 text-xs border border-green-600 ml-auto">
-                <FiCheck size={14} className="text-green-600" />
-                Conectado
+              <span
+                className={`px-2 py-1 rounded-full flex items-center gap-1 text-xs border  ml-auto ${
+                  account ? conectedStyle.conected : conectedStyle.disconected
+                }`}
+              >
+                <FiCheck size={14} />
+                {account ? 'Conectado' : 'Desconectado'}
               </span>
             </div>
 
             <button
-              className="text-sm font-semibold transition-colors border py-2 px-4 rounded-lg w-full 
-              text-secondary-light border-secondary-light/20 hover:bg-secondary-light/10 cursor-pointer"
+              className="text-sm font-semibold transition-colors border py-2 px-4 rounded-lg w-full disabled:cursor-not-allowed
+              text-secondary-light border-secondary-light/20 hover:bg-secondary-light/10 cursor-pointer flex items-center justify-center"
+              onClick={handleAccount}
+              disabled={loadingAccount}
             >
-              Desconectar conta
+              <span className={`${loadingAccount && 'hidden'}`}>
+                {account ? 'Desconectar conta' : 'Conectar conta'}
+              </span>
+              {loadingAccount && (
+                <span className="ml-2">
+                  <AiOutlineLoading3Quarters
+                    size={14}
+                    className="animate-spin text-secondary-light"
+                  />
+                </span>
+              )}
             </button>
           </div>
 

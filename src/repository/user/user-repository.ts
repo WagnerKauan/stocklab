@@ -10,5 +10,7 @@ export interface UserRepository {
   findByEmail(email: string): Promise<User | null>
   create(user: UserData): Promise<User>
   findAccountByid({provider, providerAccountId}: FindAccountById): Promise<Account | null>
+  findAccountByUserId(userId: string): Promise<Account | null>
   createAccount({userId, provider, providerAccountId}: CreateAccountParams): Promise<Account>
+  disconnectAccount({provider, providerAccountId}: FindAccountById): Promise<boolean>
 }

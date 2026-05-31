@@ -1,4 +1,5 @@
 import { setAuthCookie } from '@/lib/auth/cookies';
+import { getCurrentUser } from '@/lib/auth/get-current-user';
 import { createToken } from '@/lib/auth/token';
 import {
   createAccount,
@@ -14,7 +15,7 @@ export async function GET(request: NextRequest) {
 
     const code = searchParams.get('code');
 
-    const state = searchParams.get('mode');
+    const state = searchParams.get('state');
 
     if (!code) {
       return NextResponse.redirect(`${process.env.NEXT_PUBLIC_URL}/login`);
@@ -63,10 +64,37 @@ export async function GET(request: NextRequest) {
       providerAccountId: googleUser.id,
     });
 
-    if(state === 'link') {
-      if(!account) {
-        
+    if (state === 'link') {
+      console.log('entrou aqui no link');
+      const user = await getCurrentUser();
+      if (!user)
+        return NextResponse.redirect(`${process.env.NEXT_PUBLIC_URL}/login`);
+
+      const account = await findAccountById({
+        provider: 'google',
+        providerAccountId: googleUser.id,
+      });
+
+      if (account && account.userId !== user.id) {
+        return NextResponse.redirect(
+          `${process.env.NEXT_PUBLIC_URL}/profile?error=google-already-linked`,
+        );
       }
+
+      if (account && account.userId === user.id) {
+        return NextResponse.redirect(`${process.env.NEXT_PUBLIC_URL}/profile`);
+      }
+
+      if (!account) {
+        await createAccount({
+          provider: 'google',
+          providerAccountId: googleUser.id,
+          userId: user.id,
+          googleEmail: googleUser.email,
+        });
+      }
+
+      return NextResponse.redirect(`${process.env.NEXT_PUBLIC_URL}/profile?success=google-linked`);
     }
 
     const existEmail = await findUserByEmail(googleUser.email);
@@ -83,6 +111,7 @@ export async function GET(request: NextRequest) {
         provider: 'google',
         providerAccountId: googleUser.id,
         userId: user.id,
+        googleEmail: googleUser.email,
       });
 
       const token = await createToken(user.id);
@@ -94,6 +123,7 @@ export async function GET(request: NextRequest) {
         provider: 'google',
         providerAccountId: googleUser.id,
         userId: existEmail.id,
+        googleEmail: googleUser.email,
       });
       const token = await createToken(existEmail.id);
       await setAuthCookie(token);
@@ -104,7 +134,7 @@ export async function GET(request: NextRequest) {
       await setAuthCookie(token);
     }
 
-    return NextResponse.redirect(`${process.env.NEXT_PUBLIC_URL!}/dashboard`);
+    return NextResponse.redirect(`${process.env.NEXT_PUBLIC_URL!}/dashboard?success=authenticated`);
   } catch (error) {
     console.error('Erro durante Google OAuth callback:', error);
     return NextResponse.redirect(`${process.env.NEXT_PUBLIC_URL}/login`);

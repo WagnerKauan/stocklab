@@ -53,6 +53,7 @@ model Account {
   id String @id @default(cuid())
   provider String
   providerAccountId String
+  googleEmail String @default("")
 
   userId String
 

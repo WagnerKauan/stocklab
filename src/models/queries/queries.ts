@@ -1,18 +1,17 @@
 export type FindAccountById = {
   provider: string;
   providerAccountId: string;
-  
-}
+};
 
 export type CreateAccountParams = {
   userId: string;
   provider: string;
   providerAccountId: string;
-}
-
+  googleEmail: string;
+};
 
 export type updateAvatarProps = {
-  userId: string,
-  imageKey: string,
-  imageUrl: string
-}
+  userId: string;
+  imageKey: string;
+  imageUrl: string;
+};

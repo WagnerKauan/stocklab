@@ -24,10 +24,19 @@ export const createUser = async (data: UserData) => {
 } 
 
 
-export const findAccountById = async ({provider, providerAccountId}: FindAccountById) => {
-  return await userRepository.findAccountByid({provider, providerAccountId})
+export const findAccountById = async ({provider, providerAccountId,}: FindAccountById) => {
+  return await userRepository.findAccountByid({provider, providerAccountId,})
 }
 
-export const createAccount = async ({userId, provider, providerAccountId}: CreateAccountParams) => {
-  return await userRepository.createAccount({userId, provider, providerAccountId})
+export const findAccountByUserId = async (userId: string) => {
+  return await userRepository.findAccountByUserId(userId)
+}
+
+export const createAccount = async ({userId, provider, providerAccountId, googleEmail}: CreateAccountParams) => {
+  return await userRepository.createAccount({userId, provider, providerAccountId, googleEmail})
+}
+
+
+export const disconnectAccount = async ({provider, providerAccountId}: FindAccountById) => {
+  return await userRepository.disconnectAccount({provider, providerAccountId})
 }

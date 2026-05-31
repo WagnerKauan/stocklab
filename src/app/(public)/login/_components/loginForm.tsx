@@ -23,7 +23,7 @@ export function LoginForm() {
   });
   const [errors, setErrors] = useState<ErrorsInput[]>([]);
   const [loading, setLoading] = useState(false);
-
+ 
   function handleChange(field: string, value: string) {
     setUser(prev => ({
       ...prev,
@@ -105,7 +105,6 @@ export function LoginForm() {
    function handleGoogleLogin() {
     try {
       const url = process.env.NEXT_PUBLIC_URL || 'http://localhost:3000';
-      toast.success('Bem-vindo de volta!');
       window.location.href = `${url}/api/auth/google`;
     } catch (error) {
       console.error('Erro ao fazer login com o Google:', error);
@@ -114,6 +113,8 @@ export function LoginForm() {
       );
     }
   }
+
+  
 
   function resetState() {
     setUser({

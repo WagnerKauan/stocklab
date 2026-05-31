@@ -9,6 +9,7 @@ import { ProfilePreferences } from './_components/profile-preferences';
 import { ProfileDangerZone } from './_components/profile-danger-zone';
 import { getCurrentUser } from '@/lib/auth/get-current-user';
 import { redirect } from 'next/navigation';
+import { findAccountByUserId } from '@/lib/queries/user';
 
 export default async function Profile() {
 
@@ -17,6 +18,8 @@ export default async function Profile() {
   if(!user) return redirect('/login');
 
   const hasPassword = user.password !== null;
+
+  const account = await findAccountByUserId(user.id);
 
   return (
     <div>
@@ -31,7 +34,7 @@ export default async function Profile() {
 
         <div className="w-full h-full max-w-[70%] mx-auto mt-8">
           <ProfileSettings {...user} />
-          <ProfileSecurity hasPassword={hasPassword} />
+          <ProfileSecurity account={account} hasPassword={hasPassword} />
           <ProfilePreferences />
           <ProfileDangerZone />
         </div>
