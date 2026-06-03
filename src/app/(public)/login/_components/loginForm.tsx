@@ -1,7 +1,7 @@
 'use client';
 
 import { actionAuthUser } from '@/actions/user/action-auth-user';
-import { InputWithLabel } from '@/components/ui/input';
+import { InputWithLabel } from '@/components/ui/inputWithLabel';
 import { userSchema } from '@/schemas/user/user.schema';
 import { sanitizeLogin } from '@/utils/sanitizeUser';
 import { validateLogin } from '@/validation/user';
@@ -23,7 +23,7 @@ export function LoginForm() {
   });
   const [errors, setErrors] = useState<ErrorsInput[]>([]);
   const [loading, setLoading] = useState(false);
- 
+
   function handleChange(field: string, value: string) {
     setUser(prev => ({
       ...prev,
@@ -58,7 +58,9 @@ export function LoginForm() {
     const result = await actionAuthUser(data);
 
     if (result.code === 500) {
-      toast.error('Ocorreu um erro ao fazer login, tente novamente mais tarde.');
+      toast.error(
+        'Ocorreu um erro ao fazer login, tente novamente mais tarde.',
+      );
       setLoading(false);
       return;
     }
@@ -102,7 +104,7 @@ export function LoginForm() {
     setErrors(prev => prev.filter(err => err.field !== field));
   }
 
-   function handleGoogleLogin() {
+  function handleGoogleLogin() {
     try {
       const url = process.env.NEXT_PUBLIC_URL || 'http://localhost:3000';
       window.location.href = `${url}/api/auth/google`;
@@ -113,8 +115,6 @@ export function LoginForm() {
       );
     }
   }
-
-  
 
   function resetState() {
     setUser({

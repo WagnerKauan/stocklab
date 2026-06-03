@@ -12,11 +12,12 @@ export function NavBar() {
     '/products': 'Produtos',
     '/profile': 'Perfil',
     '/products/newProduct': 'Novo Produto',
+    '/movements': 'Movimentações',
   };
 
   return (
     <header className="max-h-17.5 bg-white w-full rounded-3xl py-3 px-6 flex items-center justify-between border border-secondary-light/20">
-      <span className="text-secondary-dark text-lg ">{links[href] || 'Informações do produto'}</span>
+      <span className="text-secondary-dark text-lg ">{links[href as keyof typeof links] || 'Informações do produto'}</span>
 
       <div className="flex items-center gap-4">
         <div className="cursor-pointer">

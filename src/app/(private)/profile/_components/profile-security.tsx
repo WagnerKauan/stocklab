@@ -1,7 +1,7 @@
 'use client';
 
 import { actionUpdatePassword } from '@/actions/profile/action-update-Password';
-import { InputWithLabel } from '@/components/ui/input';
+import { InputWithLabel } from '@/components/ui/inputWithLabel';
 import { ErrorsInput } from '@/models/global/global';
 import { updatePasswordSchema } from '@/schemas/user/update-password-schema';
 import { useEffect, useState } from 'react';

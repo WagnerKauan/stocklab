@@ -1,11 +1,11 @@
 'use client';
 
 import { actionCreateUser } from '@/actions/user/action-create-user';
-import { InputWithLabel } from '@/components/ui/input';
+import { InputWithLabel } from '@/components/ui/inputWithLabel';
 import { userSchema } from '@/schemas/user/user.schema';
 import { sanitizeUser } from '@/utils/sanitizeUser';
 import Link from 'next/link';
-import { redirect, } from 'next/navigation';
+import { redirect } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 

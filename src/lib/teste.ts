@@ -7,12 +7,14 @@ import { prisma } from "./prisma";
 
 
 async function teste() {
-  await prisma.account.update({
-    where: {
-      id: 'cmpnmdqa10001msvu2u00lw5u'
-    },
+  await prisma.stockMovement.create({
     data: {
-      googleEmail: 'kauanw711@gmail.com'
+      type: "IN",
+      quantity:10,
+      productId:"cmpnn5aac000058vu8v7nuxk6",
+      variantId: "cmpnn5ab0000358vuy769xzqv",
+      userId: "cmpnmdq9s0000msvuuo7wgdfv",
+
     }
   })
 }

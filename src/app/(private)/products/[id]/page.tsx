@@ -1,4 +1,4 @@
-"use server";
+'use server';
 
 import { ClipboardIcon } from '@/components/icons/clipboardIcon';
 import { CardMain } from '@/components/layout/cardMain';
@@ -16,18 +16,24 @@ import { sortVariants } from '@/utils/sizeOrder';
 import { getCurrentUser } from '@/lib/auth/get-current-user';
 import { redirect } from 'next/navigation';
 
+type ProductDetailPageProps = {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ variantId?: string }>;
+};
+
 export default async function ProductDetailPage({
   params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+  searchParams,
+}: ProductDetailPageProps) {
   const user = await getCurrentUser();
 
   if (!user) return redirect('/login');
 
+  const { variantId } = await searchParams;
+
   const { id } = await params;
 
-  const product = await findProductByIdChached(id);
+  const product = await findProductByIdChached(id, user.id);
 
   if (!product) {
     return <CardMain>Product not found</CardMain>;
@@ -160,7 +166,8 @@ export default async function ProductDetailPage({
                   return (
                     <tr
                       key={variant.id}
-                      className="border-b border-secondary-light/15 last:border-b-0 hover:bg-background-normal/50 transition-colors"
+                      className={`border-b border-secondary-light/15 last:border-b-0 
+                        hover:bg-background-normal/50 transition-colors ${variantId === variant.id ? 'bg-secondary-light/20' : ''}`}
                     >
                       <td className="text-center py-1.5">
                         <span className="text-sm text-primary">

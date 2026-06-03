@@ -5,8 +5,8 @@ import { DropImage } from './dropImage';
 import { VariationsTable } from './tableVariants';
 import { useState } from 'react';
 import { productSchema } from '@/schemas/product/product.schema';
-import { InputWithLabel } from '../ui/input';
-import { SelectWithLabel } from '../ui/select';
+import { InputWithLabel } from '../ui/inputWithLabel';
+import { SelectWithLabel } from '../ui/selectWithLabel';
 import { variantSchema } from '@/schemas/product/variant.schema';
 import { actionCreateProduct } from '@/actions/product/action-create-product';
 import { v4 as uuidv4 } from 'uuid';
@@ -160,7 +160,7 @@ export function FormProduct({ initialData }: FormProductProps) {
       return;
     }
 
-    if(!response.data) {
+    if (!response.data) {
       toast.error('Erro ao criar o produto');
       setIsLoading(false);
       return;
@@ -223,7 +223,7 @@ export function FormProduct({ initialData }: FormProductProps) {
         return;
     }
 
-     if(!response.data) {
+    if (!response.data) {
       toast.error('Erro ao criar o produto');
       setIsLoading(false);
       return;

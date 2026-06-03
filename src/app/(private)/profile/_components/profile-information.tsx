@@ -1,6 +1,6 @@
 'use client';
 
-import { InputWithLabel } from '@/components/ui/input';
+import { InputWithLabel } from '@/components/ui/inputWithLabel';
 import { ErrorsInput } from '@/models/global/global';
 import Image from 'next/image';
 import { useState } from 'react';
@@ -29,7 +29,7 @@ export function ProfileSettings({
   const [errors, setErrors] = useState<ErrorsInput[]>([]);
   const [loadingUpdateAvatar, setLoadingUpdateAvatar] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { startUpload, } = useUploadThing('userAvatar');
+  const { startUpload } = useUploadThing('userAvatar');
 
   const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
   const MAX_SIZE = 4 * 1024 * 1024;
@@ -116,7 +116,6 @@ export function ProfileSettings({
     const result = await actionUpdateName({ name: updateName });
 
     if (result.errors) {
-      
       result.errors.forEach(error => {
         if (error.field === 'secret') {
           toast.error(error.message);
@@ -241,8 +240,13 @@ export function ProfileSettings({
               disabled={loading}
             >
               {loading ? (
-                <AiOutlineLoading3Quarters size={17} className="animate-spin text-white" />
-              ) : ('Salvar alterações')}
+                <AiOutlineLoading3Quarters
+                  size={17}
+                  className="animate-spin text-white"
+                />
+              ) : (
+                'Salvar alterações'
+              )}
             </button>
 
             <span className="text-sm text-secondary-light block">

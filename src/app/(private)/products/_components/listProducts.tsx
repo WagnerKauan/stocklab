@@ -13,7 +13,7 @@ export function ListProducts({ products }: ListProductsProps) {
   const [filteredProducts, setFilteredProducts] = useState(products);
 
   return (
-    <div className="border border-secondary-light/20 rounded-3xl shadow-card p-6 flex flex-col flex-1 h-full overflow-hidden mt-8">
+    <div className="border border-secondary-light/20 rounded-3xl shadow-card p-6 flex flex-col flex-1 h-full  mt-8">
       {/* Filtros */}
       <div className="flex items-center justify-between mb-6">
         {/* Busca */}
@@ -60,10 +60,10 @@ export function ListProducts({ products }: ListProductsProps) {
 
       {/* Tabela de Produtos */}
 
-      <div className="flex-1 h-full overflow-y-auto pr-2">
+      <div className="flex-1 h-full">
         {/* Header - desktop */}
         
-        <div className="hidden md:grid grid-cols-[2.5fr_1fr_1fr_1fr_80px] gap-4 bg-primary-normal text-white rounded-xl px-6 py-4 sticky top-0 z-10">
+        <div className="hidden md:grid grid-cols-[2.5fr_1fr_1fr_1fr_80px] gap-4 bg-primary-normal text-white rounded-xl px-6 py-4">
           <span className="text-sm font-medium">Produto</span>
           <span className="text-sm font-medium">Categoria</span>
           <span className="text-sm font-medium">Estoque</span>

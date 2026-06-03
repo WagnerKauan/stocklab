@@ -31,7 +31,7 @@ export default async function Products() {
             href={'/products/newProduct'}
             className="py-2 px-8 bg-primary-normal hover:bg-primary-hover transition-colors rounded-lg block"
           >
-            <div className="flex items-center justify-center gap-1">
+            <div className="flex items-center justify-center gap-1 font-medium">
               <FiPlus size={24} color="#FFF" />
               <span className="text-white">Novo produto</span>
             </div>

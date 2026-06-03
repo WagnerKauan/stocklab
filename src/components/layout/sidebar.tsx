@@ -4,13 +4,13 @@ import { GoSidebarExpand } from 'react-icons/go';
 import { Logo } from '../ui/logo';
 import { FiHome, FiLogOut } from 'react-icons/fi';
 import { FiPackage } from 'react-icons/fi';
-import { FiUser } from 'react-icons/fi';
 import { FiSettings } from 'react-icons/fi';
 import { GoSidebarCollapse } from 'react-icons/go';
 import { AnchorHTMLAttributes } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { actionLogoutUser } from '@/actions/user/action-logout-user';
+import { HiArrowsRightLeft } from "react-icons/hi2";
 
 type SidebarProps = {
   isCollapsed: boolean;
@@ -40,21 +40,22 @@ export function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
           />
         ),
       },
+
+      {
+        name: 'Movimentações',
+        href: '/movements',
+        icon: (
+          <HiArrowsRightLeft
+            className={` transition-all duration-300 ${!isCollapsed ? 'text-lg' : 'text-2xl'}`}
+          />
+        ),
+      }
     ],
 
     systemLinks: [
       {
         name: 'Perfil',
         href: '/profile',
-        icon: (
-          <FiUser
-            className={` transition-all duration-300 ${!isCollapsed ? 'text-lg' : 'text-2xl'}`}
-          />
-        ),
-      },
-      {
-        name: 'Configurações',
-        href: '/settings',
         icon: (
           <FiSettings
             className={` transition-all duration-300 ${!isCollapsed ? 'text-lg' : 'text-2xl'}`}
