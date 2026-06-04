@@ -17,8 +17,8 @@ export const findAllProductsChached = cache(
 
 
 export const findProductByIdChached = cache(
-  async (id: string, userId: string) => {
-    const product = await productRepository.findById(id, userId);
+  async ({ id, userId }: { id: string, userId: string}) => {
+    const product = await productRepository.findById({ id, userId });
     if(!product) return null
     return sanitizeProduct(product, 'FRONT')  as ProductModel
   }

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { FiMoreHorizontal, FiSearch } from 'react-icons/fi';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { MovementModel } from '@/models/movements/movements-model';
 import Image from 'next/image';
 
@@ -11,7 +11,11 @@ type ListMovementsProps = {
 };
 
 export function ListMovements({ movements }: ListMovementsProps) {
-  const [filteredMovements, setFilteredMovements] = useState(movements);
+  const [filteredMovements, setFilteredMovements] = useState<MovementModel[]>([]);
+
+  useEffect(() => {
+    setFilteredMovements(movements);
+  }, [movements]);
 
   return (
     <div className="mt-8">
@@ -33,7 +37,7 @@ export function ListMovements({ movements }: ListMovementsProps) {
             <FiSearch size={16} color="#FFF" />
           </label>
         </div>
-        <div className="flex items-center gap-6 w-full max-w-125 pr-4">
+        <div className="flex items-center gap-6 w-full max-w-125">
           {/* Select tipo */}
           <select
             className="bg-background-normal border border-secondary-light/20 text-secondary-normal text-sm 

@@ -8,3 +8,11 @@ export type MovementModel = {
   variant: Variant;
 
 } & StockMovement
+
+
+export type MovementData = {
+  productId: string;
+  variantId: string;
+  type: 'IN' | 'OUT';
+  quantity: number;
+}

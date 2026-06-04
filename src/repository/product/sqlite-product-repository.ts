@@ -19,7 +19,7 @@ export class SqliteProductRepository implements ProductRepository {
     return products;
   }
 
-  async findById(id: string, userId: string): Promise<ProductModel | null> {
+  async findById({ id, userId }: { id: string; userId: string }): Promise<ProductModel | null> {
     const product = await prisma.product.findUnique({
       where: {
         id: id,
@@ -28,8 +28,9 @@ export class SqliteProductRepository implements ProductRepository {
       include: {
         variants: true,
       },
-    });
 
+    });
+    
     return product;
   }
 

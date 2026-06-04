@@ -1,12 +1,13 @@
 'use client';
 import { ProductVariant } from '@/models/product/product-model';
 import { formatCurrencyInput } from '@/utils/formatPrice';
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import type { ErrorInput } from './formProduct';
 import { v4 as uuidv4 } from 'uuid';
 import { sanitizeNumberInput } from '@/utils/sanitizeNumberInput';
 
 type VariationsTableProps = {
+  existingVariants: ProductVariant[];
   variants: ProductVariant[];
   errors: ErrorInput[];
   setVariants: React.Dispatch<React.SetStateAction<ProductVariant[]>>;
@@ -26,17 +27,16 @@ const empty = (): ProductVariant => ({
 export function VariationsTable({
   errors,
   variants,
+  existingVariants,
   setErrors,
   setVariants,
   handleOnBlur,
 }: VariationsTableProps) {
-  
   const update = useCallback(
     (i: number, field: keyof ProductVariant, value: string | number) => {
-
       //Aqui eu transforma o valor para número
-      if(field === 'priceInCents' || field === 'stock') value = sanitizeNumberInput(value, 6);
-
+      if (field === 'priceInCents' || field === 'stock')
+        value = sanitizeNumberInput(value, 6);
 
       setVariants(prev =>
         prev.map((v, idx) => (idx === i ? { ...v, [field]: value } : v)),
@@ -55,12 +55,15 @@ export function VariationsTable({
   const fildNames = ['size', 'color', 'stock', 'priceInCents'];
   const errorsForm = errors.filter(err => fildNames.includes(err.field));
 
-  function handleOnblurVariant(idRow: string, field: string, value: string | number) {
-     if(field === 'priceInCents' || field === 'stock') value = sanitizeNumberInput(value);
+  function handleOnblurVariant(
+    idRow: string,
+    field: string,
+    value: string | number,
+  ) {
+    if (field === 'priceInCents' || field === 'stock')
+      value = sanitizeNumberInput(value);
     handleOnBlur(field, value, idRow);
   }
-
-  
 
   return (
     <div className="flex flex-col gap-3 h-full overflow-hidden">
@@ -76,9 +79,11 @@ export function VariationsTable({
               <th className="text-left text-[13px] font-medium text-white px-4 py-3">
                 Cor
               </th>
+
               <th className="text-left text-[13px] font-medium text-white px-4 py-3 w-28">
                 Estoque
               </th>
+
               <th className="text-right text-[13px] font-medium text-white px-4 py-3 w-32">
                 Preço
               </th>
@@ -87,14 +92,18 @@ export function VariationsTable({
           </thead>
           <tbody>
             {variants.map((v, i) => {
-              const cell = errors.filter(err => err.id === v.id); 
+              const cell = errors.filter(err => err.id === v.id);
 
-                
+              const existingVariant = existingVariants.find(
+                ev => ev.id === v.id,
+              );
+
               return (
                 <tr
                   key={i}
                   className="border-b border-secondary-light/15 last:border-b-0 hover:bg-background-normal/50 transition-colors"
                 >
+                  {/* Size */}
                   <td className="px-4 py-1.5">
                     <input
                       className={`w-full py-1.5 text-sm bg-transparent border-none outline-none text-primary placeholder:text-tertiary
@@ -109,6 +118,8 @@ export function VariationsTable({
                       }
                     />
                   </td>
+
+                  {/* Color */}
                   <td className="px-4 py-1.5">
                     <input
                       className={`w-full  py-1.5 text-sm bg-transparent outline-none text-primary placeholder:text-tertiary
@@ -123,30 +134,49 @@ export function VariationsTable({
                       }
                     />
                   </td>
-                  <td className="px-4 py-1.5">
-                    <input
-                      className={`w-full py-1.5 text-sm bg-transparent outline-none text-primary placeholder:text-tertiary
+
+                  {/* Stock */}
+
+                  <td className="px-4 py-1.5 ">
+                    {existingVariant !== undefined && (
+                      <span
+                        title="Alterado em movimentações"
+                        className={`w-full py-1.5 text-sm bg-transparent outline-none text-primary 
+                        placeholder:text-tertiary cursor-not-allowed opacity-50 block
+                        
+                    `}
+                      >
+                        {v.stock || ''}
+                      </span>
+                    )}
+                    {!existingVariant && (
+                      <input
+                        className={`w-full py-1.5 text-sm bg-transparent outline-none text-primary 
+                        placeholder:text-tertiary disabled:cursor-not-allowed disabled:opacity-50
                       ${cell.some(err => err.field === 'stock') ? 'border-b border-b-error' : 'border-none'}  
                     `}
-                      type="text"
-                      placeholder="estoque"
-                      value={v.stock || ''}
-                      onChange={e => 
-                        update(
-                          i,
-                          'stock',
-                          e.target.value.replace(/[^0-9]/g, ''),
-                        )
-                      }
-                      onBlur={e =>
-                        handleOnblurVariant(v.id, 'stock', e.target.value)
-                      }
-                    />
+                        type="text"
+                        placeholder="estoque"
+                        value={v.stock || ''}
+                        onChange={e =>
+                          update(
+                            i,
+                            'stock',
+                            e.target.value.replace(/[^0-9]/g, ''),
+                          )
+                        }
+                        onBlur={e =>
+                          handleOnblurVariant(v.id, 'stock', e.target.value)
+                        }
+                      />
+                    )}
                   </td>
+
+                  {/* Price */}
                   <td className="px-4 py-1.5 text-right">
                     <input
                       className={`w-full py-1.5 text-sm bg-transparent outline-none text-primary placeholder:text-tertiary text-right
-                      ${cell.some(err => err.field === 'priceInCents') ? 'border-b border-b-error' : 'border-none' } 
+                      ${cell.some(err => err.field === 'priceInCents') ? 'border-b border-b-error' : 'border-none'} 
                     `}
                       type="text"
                       placeholder="Preço"
@@ -160,14 +190,17 @@ export function VariationsTable({
                           'priceInCents',
                           e.target.value,
                         )
-                      } 
+                      }
                     />
                   </td>
+
                   <td className="px-2 text-center">
                     <button
                       onClick={() => {
-                        removeRow(i),
-                        setErrors(prev => prev.filter(err => err.id !== v.id))
+                        (removeRow(i),
+                          setErrors(prev =>
+                            prev.filter(err => err.id !== v.id),
+                          ));
                       }}
                       className="w-7 h-7 rounded-md text-tertiary hover:text-red-500 hover:bg-red-50 transition-colors text-sm"
                     >

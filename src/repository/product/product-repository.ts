@@ -4,7 +4,7 @@ import { Product } from '../../../generated/prisma/client';
 
 export interface ProductRepository {
   findAll(userId: string): Promise<ProductModel[]>;
-  findById(id: string, userId: string): Promise<ProductModel | null>;
+  findById({ id, userId }: { id: string; userId: string }): Promise<ProductModel | null>;
 
   create(product: ProductData & { userId: string }): Promise<Product | null>;
 

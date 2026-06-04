@@ -17,7 +17,10 @@ export default async function ProductEdit({
 
   const { id } = await params;
 
-  const product = await findProductByIdChached(id, user.id);
+  const product = await findProductByIdChached({
+    id,
+    userId: user.id,
+  });
 
   if (!product) {
     return <CardMain>Product not found</CardMain>;

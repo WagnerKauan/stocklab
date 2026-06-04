@@ -51,6 +51,8 @@ export function FormProduct({ initialData }: FormProductProps) {
   const { startUpload, isUploading } = useUploadThing('productImage');
   const [imageFile, setImageFile] = useState<File | null>(null);
 
+  const existingVariants = initialData?.variants || [];
+
   const handleChange = (field: string, value: string) => {
     setProduct(prev => ({
       ...prev,
@@ -299,6 +301,7 @@ export function FormProduct({ initialData }: FormProductProps) {
       />
 
       <VariationsTable
+        existingVariants={existingVariants}
         errors={errors}
         setErrors={setErrors}
         variants={variants}

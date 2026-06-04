@@ -2,7 +2,7 @@
 
 import { getCurrentUser } from "@/lib/auth/get-current-user";
 import { findProductByIdChached, syncVariants, updateProduct } from "@/lib/queries/product";
-import { ProductModel } from "@/models/product/product-model";
+import { ProductModel, ProductVariant } from "@/models/product/product-model";
 import { sanitizeProduct } from "@/utils/sanitazeProduct";
 import { validateProduct } from "@/validation/product";
 import { redirect } from "next/navigation";
@@ -30,7 +30,10 @@ export async function actionUpdateProduct(data: ProductModel) {
     }
   }
 
-  const productDB = await findProductByIdChached(productData.id, user.id);
+  const productDB = await findProductByIdChached({
+    id: productData.id,
+    userId: user.id
+  });
 
   if(!productDB) {
     return {
@@ -48,10 +51,28 @@ export async function actionUpdateProduct(data: ProductModel) {
   const variantsToCreate = sanitazedProduct.variants.filter(variant => !variantsDB.some(variantDB => variantDB.id === variant.id ))
 
   //Percorro as variações do front e verifico se elas existem no banco de dados se exister eu atualizo se não ignoro
-  const variantsToUpdate = sanitazedProduct.variants.filter(variant => variantsDB.some(variantDB => variantDB.id === variant.id))
+const variantsToUpdate = sanitazedProduct.variants
+  .map(variant => {
+
+  // Estoque não pode ser alterado via update do produto.
+  // Apenas movimentações podem modificar o stock.
+    const variantDB = variantsDB.find(
+      variantDB => variantDB.id === variant.id
+    );
+
+    if (!variantDB) return null;
+
+    return {
+      ...variant,
+      stock: variantDB.stock,
+    };
+  })
+  .filter((variant): variant is ProductVariant => variant !== null);
 
   //Percorro as variações do banco de dados e verifico se elas existem no front se não existir eu deleto
   const variantsToDelete = variantsDB.filter(variantDB => !sanitazedProduct.variants.some(variant => variant.id === variantDB.id))
+
+
 
   const variantsToSync = {
     productId: productDB.id,
