@@ -5,6 +5,12 @@ import { useCallback, useEffect } from 'react';
 import type { ErrorInput } from './formProduct';
 import { v4 as uuidv4 } from 'uuid';
 import { sanitizeNumberInput } from '@/utils/sanitizeNumberInput';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+import { HiArrowsRightLeft } from 'react-icons/hi2';
 
 type VariationsTableProps = {
   existingVariants: ProductVariant[];
@@ -107,8 +113,8 @@ export function VariationsTable({
                   <td className="px-4 py-1.5">
                     <input
                       className={`w-full py-1.5 text-sm bg-transparent border-none outline-none text-primary placeholder:text-tertiary
-                      ${cell.some(err => err.field === 'size') ? 'border-b border-b-error' : 'border-none'}  
-                    `}
+                    ${cell.some(err => err.field === 'size') ? 'border-b border-b-error' : 'border-none'}  
+                  `}
                       type="text"
                       placeholder="Ex: M"
                       value={v.size || ''}
@@ -123,8 +129,8 @@ export function VariationsTable({
                   <td className="px-4 py-1.5">
                     <input
                       className={`w-full  py-1.5 text-sm bg-transparent outline-none text-primary placeholder:text-tertiary
-                      ${cell.some(err => err.field === 'color') ? 'border-b border-b-error' : 'border-none'}
-                      `}
+                    ${cell.some(err => err.field === 'color') ? 'border-b border-b-error' : 'border-none'}
+                    `}
                       type="text"
                       placeholder="Ex: Preto"
                       value={v.color || ''}
@@ -139,22 +145,40 @@ export function VariationsTable({
 
                   <td className="px-4 py-1.5 ">
                     {existingVariant !== undefined && (
-                      <span
-                        title="Alterado em movimentações"
-                        className={`w-full py-1.5 text-sm bg-transparent outline-none text-primary 
-                        placeholder:text-tertiary cursor-not-allowed opacity-50 block
-                        
-                    `}
-                      >
-                        {v.stock || ''}
-                      </span>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span
+                            className=" w-full py-1.5 text-sm text-primary-normal cursor-not-allowed opacity-60 block"
+                          >
+                            {v.stock}
+                          </span>
+                        </TooltipTrigger>
+
+                        <TooltipContent
+                          side="top"
+                          className="flex items-center gap-2 rounded-xl border border-secondary-light/10  bg-secondary-dark
+                          px-3 py-2 text-xs text-white shadow-lg"
+                        >
+                          <HiArrowsRightLeft className="size-3.5 shrink-0 text-primary-normal" />
+
+                          <div className="flex flex-col">
+                            <span className="font-medium">
+                              Estoque protegido
+                            </span>
+
+                            <span className="text-white/70">
+                              Altere através das movimentações.
+                            </span>
+                          </div>
+                        </TooltipContent>
+                      </Tooltip>
                     )}
                     {!existingVariant && (
                       <input
                         className={`w-full py-1.5 text-sm bg-transparent outline-none text-primary 
-                        placeholder:text-tertiary disabled:cursor-not-allowed disabled:opacity-50
-                      ${cell.some(err => err.field === 'stock') ? 'border-b border-b-error' : 'border-none'}  
-                    `}
+                      placeholder:text-tertiary disabled:cursor-not-allowed disabled:opacity-50
+                    ${cell.some(err => err.field === 'stock') ? 'border-b border-b-error' : 'border-none'}  
+                  `}
                         type="text"
                         placeholder="estoque"
                         value={v.stock || ''}
@@ -176,8 +200,8 @@ export function VariationsTable({
                   <td className="px-4 py-1.5 text-right">
                     <input
                       className={`w-full py-1.5 text-sm bg-transparent outline-none text-primary placeholder:text-tertiary text-right
-                      ${cell.some(err => err.field === 'priceInCents') ? 'border-b border-b-error' : 'border-none'} 
-                    `}
+                    ${cell.some(err => err.field === 'priceInCents') ? 'border-b border-b-error' : 'border-none'} 
+                  `}
                       type="text"
                       placeholder="Preço"
                       value={formatCurrencyInput(v.priceInCents).formatted}
@@ -216,68 +240,68 @@ export function VariationsTable({
 
       {/* Mobile */}
       {/* <div className="md:hidden border border-secondary-light/20 rounded-xl overflow-hidden">
-        <div className="bg-[#4A7CF7] flex px-4 py-3">
-          <span className="flex-1 text-[13px] font-medium text-white">
-            Tamanho / Cor
-          </span>
-          <span className="text-[13px] font-medium text-white">Ações</span>
-        </div>
-        {variants.map((v, i) => (
-          <div
-            key={i}
-            className="border-b border-secondary-light/15 last:border-b-0"
-          >
-            <div className="flex items-center gap-2 px-4 pt-3 pb-1">
+      <div className="bg-[#4A7CF7] flex px-4 py-3">
+        <span className="flex-1 text-[13px] font-medium text-white">
+          Tamanho / Cor
+        </span>
+        <span className="text-[13px] font-medium text-white">Ações</span>
+      </div>
+      {variants.map((v, i) => (
+        <div
+          key={i}
+          className="border-b border-secondary-light/15 last:border-b-0"
+        >
+          <div className="flex items-center gap-2 px-4 pt-3 pb-1">
+            <input
+              className="w-20 text-sm font-medium bg-transparent border-none outline-none text-primary placeholder:text-tertiary"
+              type="text"
+              placeholder="Tam."
+              value={v.size}
+              onChange={e => update(i, 'size', e.target.value)}
+            />
+            <input
+              className="flex-1 text-sm text-secondary bg-transparent border-none outline-none placeholder:text-tertiary"
+              type="text"
+              placeholder="Cor"
+              value={v.color}
+              onChange={e => update(i, 'color', e.target.value)}
+            />
+            <button
+              onClick={() => removeRow(i)}
+              className="w-7 h-7 rounded-md text-tertiary hover:text-red-500 hover:bg-red-50 transition-colors text-sm shrink-0"
+            >
+              ✕
+            </button>
+          </div>
+          <div className="flex gap-4 px-4 pb-3">
+            <div className="flex-1">
+              <span className="text-[11px] text-tertiary block mb-0.5">
+                Estoque
+              </span>
               <input
-                className="w-20 text-sm font-medium bg-transparent border-none outline-none text-primary placeholder:text-tertiary"
+                className="w-full text-sm bg-transparent border-none outline-none text-primary placeholder:text-tertiary"
                 type="text"
-                placeholder="Tam."
-                value={v.size}
-                onChange={e => update(i, 'size', e.target.value)}
+                placeholder="0"
+                value={v.stock}
+                onChange={e => update(i, 'stock', e.target.value)}
               />
-              <input
-                className="flex-1 text-sm text-secondary bg-transparent border-none outline-none placeholder:text-tertiary"
-                type="text"
-                placeholder="Cor"
-                value={v.color}
-                onChange={e => update(i, 'color', e.target.value)}
-              />
-              <button
-                onClick={() => removeRow(i)}
-                className="w-7 h-7 rounded-md text-tertiary hover:text-red-500 hover:bg-red-50 transition-colors text-sm shrink-0"
-              >
-                ✕
-              </button>
             </div>
-            <div className="flex gap-4 px-4 pb-3">
-              <div className="flex-1">
-                <span className="text-[11px] text-tertiary block mb-0.5">
-                  Estoque
-                </span>
-                <input
-                  className="w-full text-sm bg-transparent border-none outline-none text-primary placeholder:text-tertiary"
-                  type="text"
-                  placeholder="0"
-                  value={v.stock}
-                  onChange={e => update(i, 'stock', e.target.value)}
-                />
-              </div>
-              <div className="flex-1">
-                <span className="text-[11px] text-tertiary block mb-0.5">
-                  Preço
-                </span>
-                <input
-                  className="w-full text-sm bg-transparent border-none outline-none text-primary placeholder:text-tertiary"
-                  type="text"
-                  placeholder="0,00"
-                  value={v.priceInCents}
-                  onChange={e => update(i, 'priceInCents', e.target.value)}
-                />
-              </div>
+            <div className="flex-1">
+              <span className="text-[11px] text-tertiary block mb-0.5">
+                Preço
+              </span>
+              <input
+                className="w-full text-sm bg-transparent border-none outline-none text-primary placeholder:text-tertiary"
+                type="text"
+                placeholder="0,00"
+                value={v.priceInCents}
+                onChange={e => update(i, 'priceInCents', e.target.value)}
+              />
             </div>
           </div>
-        ))}
-      </div> */}
+        </div>
+      ))}
+    </div> */}
 
       <div
         className={`flex items-center ${errorsForm.length > 0 ? 'justify-between' : 'justify-end'}`}
