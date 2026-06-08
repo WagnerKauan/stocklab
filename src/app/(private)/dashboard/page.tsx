@@ -40,30 +40,30 @@ export default async function Dashboard() {
   }, 0);
 
   return (
-    <div className="flex flex-col gap-6 flex-1">
-      <div className=" grid grid-cols-3 gap-6">
+    <div className="flex flex-col gap-4 xl:gap-6 flex-1">
+      <div className=" xl:grid xl:grid-cols-3 flex flex-wrap gap-4 xl:gap-6">
         <CardDashboard
           title="Produtos"
           value={totalProducts.length.toString()}
-          icon={<FiBox size={24} color="#FFF" />}
+          icon={<FiBox color="#FFF" />}
           bgColor="bg-primary-normal"
         />
         <CardDashboard
-          title="Em estoque"
+          title="Estoque"
           value={totalInStock.toString()}
           icon={<StockIcon color="#FFF" />}
           bgColor="bg-secondary-dark"
         />
         <CardDashboard
-          title="Variações em alerta"
+          title="Alertas"
           value={variationsInLowStock.toString()}
-          icon={<FiAlertCircle size={24} color="#FFF" />}
+          icon={<FiAlertCircle color="#FFF" />}
           bgColor="bg-warning"
         />
       </div>
 
       <CardMain>
-        <div className="flex flex-col gap-8">
+        <div className="flex flex-col gap-8 h-full">
           <div>
             <TitleSection
               typeTitle="warning"

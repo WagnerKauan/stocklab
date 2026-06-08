@@ -1,8 +1,10 @@
 import { MINIMUM_STOCK_VARIANTS } from '@/settings/variablesGlobal';
 import Image from 'next/image';
+import Link from 'next/link';
 import { FiAlertTriangle } from 'react-icons/fi';
 
 type CardProductLowStockProps = {
+  id: string;
   name: string;
   image: string;
   stock: number;
@@ -21,25 +23,27 @@ export function CardProductLowStock({
   name,
   image,
   variants,
+  id,
 }: CardProductLowStockProps) {
   const isHalfStock = variants.every(
     variant => variant.stock >= MINIMUM_STOCK_VARIANTS / 2,
   );
 
   return (
-    <div className="w-full border border-secondary-light/20 rounded-3xl shadow-card p-4">
+    <Link href={`/products/${id}`} className="w-full block border border-secondary-light/20 rounded-3xl shadow-card p-4 
+      hover:bg-background-normal hover:border-secondary-light/40 transition-colors">
       <div className="flex items-center gap-4">
         {/* Imagem */}
-        <div className="h-25 w-23 flex items-center justify-center rounded-xl overflow-hidden border border-secondary-light/20">
+        <div className="h-20 w-23 xl:h-25 xl:w-23 flex items-center justify-center rounded-xl overflow-hidden border border-secondary-light/20">
           <Image src={image} alt={name} className="object-cover w-full h-full" height={100} width={100} />
         </div>
 
         {/* Informações */}
-        <div className="flex flex-col justify-between  w-full gap-2">
+        <div className="flex flex-col justify-between  w-full gap-1.5 xl:gap-2">
           {/* Header */}
           <div className="flex items-start justify-between">
             <div>
-              <h5 className="text-lg text-secondary-dark font-medium">
+              <h5 className=" line-clamp-1 xl:text-lg text-secondary-dark font-medium">
                 {name}
               </h5>
             </div>
@@ -60,7 +64,7 @@ export function CardProductLowStock({
 
           {/* Variations */}
           <div className="flex flex-wrap gap-2">
-            {variants.map(variant => (
+            {variants.slice(0, 1).map(variant => (
               <div
                 key={variant.id}
                 className={`py-1 px-2  
@@ -77,6 +81,6 @@ export function CardProductLowStock({
           </div>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }

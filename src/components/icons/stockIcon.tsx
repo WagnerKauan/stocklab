@@ -2,12 +2,14 @@ type StockIconProps = {
   size?: number;
   color?: string;
   strokeWidth?: number;
+  className?: string;
 };
 
 export function StockIcon({
-  size = 24,
+  size = 18,
   color = 'currentColor',
   strokeWidth = 2,
+  className = '',
 }: StockIconProps) {
   return (
     <svg
@@ -20,6 +22,7 @@ export function StockIcon({
       strokeWidth={strokeWidth}
       strokeLinecap="round"
       strokeLinejoin="round"
+      className={className}
     >
       <circle cx="6" cy="19" r="2" />
 

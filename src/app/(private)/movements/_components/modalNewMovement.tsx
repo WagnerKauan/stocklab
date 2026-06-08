@@ -164,7 +164,7 @@ export function ModalNewMovement() {
           Nova movimentação
         </button>
       </DialogTrigger>
-      <DialogContent className="max-w-md p-6 gap-0 rounded-3xl">
+      <DialogContent className="max-w-md p-6 gap-0 rounded-3xl bg-white shadow shadow-secondary-light/10 ring-1 ring-secondary-light/10">
         <DialogHeader className="flex flex-row items-center gap-4 pb-4 border-b border-secondary-light/10">
           <div className="p-3 bg-blue-50 text-blue-500 rounded-2xl border border-blue-100 shrink-0">
             <HiArrowsRightLeft className="size-6" />
@@ -181,17 +181,18 @@ export function ModalNewMovement() {
 
         {/* Form */}
         <div className="flex flex-col gap-5 py-5">
-          {/* Tipo de Movimentação */}
 
           {errors.length > 0 && (
             <div
-              className="flex items-center gap-2 px-3 py-2 rounded-xl bg-error/10 text-error border 
-                border-error/20 text-xs font-semibold w-full mt-1 animate-in fade-in duration-200"
+            className="flex items-center gap-2 px-3 py-2 rounded-xl bg-error/10 text-error border 
+            border-error/20 text-xs font-semibold w-full mt-1 animate-in fade-in duration-200"
             >
               <FiAlertCircle className="size-4 shrink-0" />
               <span>{errors[0].message}</span>
             </div>
           )}
+
+          {/* Tipo de Movimentação */}
           <div className="flex flex-col gap-2">
             <span className="text-xs font-bold uppercase tracking-wider text-secondary-light">
               Tipo da movimentação
@@ -247,9 +248,9 @@ export function ModalNewMovement() {
                   <SelectValue placeholder="Selecione um produto" />
                 </div>
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="w-full bg-white rounded-xl shadow shadow-secondary-light/10 ring-1 ring-secondary-light/10">
                 {products.map(product => (
-                  <SelectItem key={product.id} value={product.id}>
+                  <SelectItem key={product.id} value={product.id} className='hover:bg-secondary-light/5 transition-colors'>
                     <div className="flex items-center gap-2">
                       <div className="w-6 h-6 rounded-full overflow-hidden shrink-0 border border-secondary-light/10">
                         {product.productImage ? (
@@ -293,9 +294,9 @@ export function ModalNewMovement() {
                   <SelectValue placeholder="Selecione a variante" />
                 </div>
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="w-full bg-white rounded-xl shadow shadow-secondary-light/10 ring-1 ring-secondary-light/10">
                 {selectedProduct?.variants.map(variant => (
-                  <SelectItem key={variant.id} value={variant.id}>
+                  <SelectItem key={variant.id} value={variant.id} className='hover:bg-secondary-light/5 transition-colors'>
                     <span className="text-secondary-dark font-medium">
                       {variant.size && variant.color
                         ? `${variant.size} / ${variant.color}`

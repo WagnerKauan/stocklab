@@ -32,7 +32,7 @@ export default async function Profile() {
         />
         <hr className="text-secondary-light/20 mt-8" />
 
-        <div className="w-full h-full max-w-[70%] mx-auto mt-8">
+        <div className="w-full h-full xl:max-w-[70%] xl:mx-auto mt-8">
           <ProfileSettings {...user} />
           <ProfileSecurity account={account} hasPassword={hasPassword} />
           <ProfilePreferences />

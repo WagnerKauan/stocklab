@@ -4,7 +4,7 @@ type CardMainProps = {
 
 export function   CardMain({ children }: CardMainProps) {
   return (
-    <main className=" border rounded-3xl border-secondary-light/20 bg-white p-8 flex-1">
+    <main className=" border rounded-3xl border-secondary-light/20 bg-white p-4 md:p-6 xl:p-8 flex-1">
       {children}
     </main>
   );

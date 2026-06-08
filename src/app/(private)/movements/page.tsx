@@ -71,18 +71,20 @@ export default async function Movements() {
       </div>
 
       <CardMain>
-        <div className='flex items-center justify-between'>
-          <TitleSection
-            title="Movimentações Recentes"
-            paragrafo="Veja as movimentações mais recentes do seu estoque."
-            typeTitle="info"
-            icon={<HiArrowsRightLeft size={32} color="#FFF" />}
-          />
+        <div className="flex flex-col gap-8 h-full">
+          <div className='flex items-center justify-between '>
+            <TitleSection
+              title="Movimentações Recentes"
+              paragrafo="Veja as movimentações mais recentes do seu estoque."
+              typeTitle="info"
+              icon={<HiArrowsRightLeft size={32} color="#FFF" />}
+            />
 
-          <ModalNewMovement />
+            <ModalNewMovement />
+          </div>
+
+          <ListMovements movements={sanitizedMovements} />
         </div>
-
-        <ListMovements movements={sanitizedMovements} />
       </CardMain>
     </div>
   );
