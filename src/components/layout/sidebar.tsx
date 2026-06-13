@@ -74,8 +74,8 @@ export function Sidebar({ isCollapsed, setIsCollapsed }: SidebarProps) {
 
   return (
     <aside
-      className={` hidden md:flex  ${isCollapsed ? 'w-22 px-3 py-6 rounded-2xl' : 'lg:w-64 xl:w-96 p-6 rounded-3xl'} transition-[width,padding,border-radius] 
-      duration-300 ease-in-out max-w-60 h-full border border-secondary-light/20 flex flex-col justify-between bg-white`}
+      className={` hidden md:flex  ${isCollapsed ? 'w-22 px-3 py-6' : 'lg:w-64 xl:w-96 p-6'} transition-[width,padding,border-radius] 
+      duration-300 ease-in-out max-w-60 h-full border-r border-secondary-light/20 flex flex-col justify-between bg-white`}
     >
       <div>
         {/* LOGO */}

@@ -69,7 +69,7 @@ export default async function Dashboard() {
               typeTitle="warning"
               title="Alerta de estoque baixo"
               paragrafo="Variações de produtos que precisam de reposição urgente"
-              icon={<FiBox size={32} color="#FFF" />}
+              icon={<FiBox color="#FFF" />}
             />
           </div>
 

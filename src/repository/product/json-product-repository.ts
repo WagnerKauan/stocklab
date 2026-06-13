@@ -3,6 +3,7 @@ import { readFile } from 'fs/promises';
 import { resolve } from 'path';
 import { ProductRepository } from './product-repository';
 import { ProductData } from '@/models/product/product-model';
+import { Product } from '../../../generated/prisma/client';
 
 const ROOT_DIR = process.cwd();
 const JSON_PRODUCTS_PATH = resolve(
@@ -26,13 +27,13 @@ export class JsonProductRepository implements ProductRepository {
     return products;
   }
 
-  async findById(id: string): Promise<ProductModel | null> {
+  async findById({ id }: { id: string }): Promise<ProductModel | null> {
     const products = await this.readFromDisk();
     const product = products.find(p => p.id === id) || null;
     return product;
   }
 
-  create(data: ProductData): Promise<boolean> {
+  create(product: ProductData & { userId: string }): Promise<Product | null> {
     throw new Error('Method not implemented.');
   }
 
@@ -40,7 +41,7 @@ export class JsonProductRepository implements ProductRepository {
     throw new Error('Method not implemented.');
   }
 
-  update(product: ProductModel): Promise<boolean> {
+  update(product: ProductModel): Promise<Product | null> {
     throw new Error('Method not implemented.');
   }
   

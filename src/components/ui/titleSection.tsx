@@ -27,7 +27,7 @@ export function TitleSection({ typeTitle, title, paragrafo, icon}: TitleSectionP
     {/* titles */}
     <div>
       <h3 className="text-xl xl:text-[28px]/8  text-secondary-dark">{title}</h3>
-      <p className="text-secondary-light text-sm xl:text-[16px]">{paragrafo}</p>
+      <p className="text-secondary-light text-sm xl:text-[16px] line-clamp-1">{paragrafo}</p>
     </div>
 
   </div>

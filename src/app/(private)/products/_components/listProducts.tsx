@@ -1,10 +1,18 @@
 'use client';
 import { ProductModel } from '@/models/product/product-model';
-import { FiMoreHorizontal, FiSearch } from 'react-icons/fi';
+import { FiMoreHorizontal, FiSearch, FiEye, FiEdit, FiTrash2 } from 'react-icons/fi';
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Pagination } from '@/components/ui/pagination';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { redirect } from 'next/navigation';
 
 type ListProductsProps = {
   products: ProductModel[];
@@ -225,17 +233,40 @@ export function ListProducts({ products }: ListProductsProps) {
                       </span>
 
                       {/* Ações */}
-                      <div className="flex justify-center">
-                        <Link
-                          className="cursor-pointer"
-                          href={`/products/${product.id}`}
-                        >
-                          <FiMoreHorizontal
-                            size={20}
-                            className="text-secondary-dark hover:text-primary-normal transition-colors"
-                          />
-                        </Link>
-                      </div>
+
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <button className="p-1 rounded-md hover:text-secondary-light/20 
+                            transition-colors cursor-pointer pl-3">
+                            <FiMoreHorizontal size={20} className="text-secondary-dark" />
+                          </button>
+                        </DropdownMenuTrigger>
+
+                        <DropdownMenuContent align="end" className='bg-secondary-dark ring-1 ring-secondary-light text-white'>
+                          <DropdownMenuItem 
+                          className='hover:bg-secondary-normal transition-colors cursor-pointer'
+                          onClick={() => redirect(`/products/${product.id}`)}>
+                            <FiEye size={16} />
+                            Ver
+                          </DropdownMenuItem>
+
+                          <DropdownMenuItem
+                          className='hover:bg-secondary-normal transition-colors cursor-pointer' 
+                          onClick={() => redirect(`/products/${product.id}/edit`)}>
+                            <FiEdit size={16} />
+                            Editar
+                          </DropdownMenuItem>
+                           <DropdownMenuSeparator className='border border-secondary-normal' />
+                          <DropdownMenuItem
+                            onClick={() => alert('Função de exclusão acionada. Implementar lógica de exclusão aqui.')}
+                            className="text-error focus:text-error hover:bg-error/20 transition-colors cursor-pointer"
+                          >
+                            <FiTrash2 size={16} />
+                            Deletar
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+
                     </div>
 
                     {/* Mobile */}

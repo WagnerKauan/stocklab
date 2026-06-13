@@ -202,7 +202,7 @@ export function ProfileSettings({
 
         {/* Campos do perfil */}
         <div className="flex flex-col gap-5 w-full">
-          <div className="flex gap-4">
+          <div className="flex flex-col sm:flex-row gap-4">
             <div className="relative flex-1">
               <InputWithLabel
                 label="Nome"
@@ -248,10 +248,6 @@ export function ProfileSettings({
                 'Salvar alterações'
               )}
             </button>
-
-            <span className="text-sm text-secondary-light block">
-              As alterações são salvas na sua conta.
-            </span>
           </div>
         </div>
       </div>

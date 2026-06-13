@@ -49,35 +49,35 @@ export default async function Movements() {
 
   return (
     <div className="flex flex-col gap-6 flex-1">
-      <div className=" grid grid-cols-3 gap-6">
+      <div className=" xl:grid xl:grid-cols-3 flex flex-wrap gap-4 xl:gap-6">
         <CardDashboard
           title="Movimentações"
           value={totalMovements.toString()}
-          icon={<HiArrowsRightLeft size={24} color="#FFF" />}
+          icon={<HiArrowsRightLeft size={18} color="#FFF" />}
           bgColor="bg-primary-normal"
         />
         <CardDashboard
           title="Entradas"
           value={totalEntries.toString()}
-          icon={<IconEntriesStock size={24} color="#FFF" />}
+          icon={<IconEntriesStock size={18} color="#FFF" />}
           bgColor="bg-secondary-dark"
         />
         <CardDashboard
           title="Saídas"
           value={totalExits.toString()}
-          icon={<IconExitStock size={24} color="#FFF" />}
+          icon={<IconExitStock size={18} color="#FFF" />}
           bgColor="bg-error"
         />
       </div>
 
       <CardMain>
         <div className="flex flex-col gap-8 h-full">
-          <div className='flex items-center justify-between '>
+          <div className='flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between '>
             <TitleSection
               title="Movimentações Recentes"
               paragrafo="Veja as movimentações mais recentes do seu estoque."
               typeTitle="info"
-              icon={<HiArrowsRightLeft size={32} color="#FFF" />}
+              icon={<HiArrowsRightLeft color="#FFF" />}
             />
 
             <ModalNewMovement />

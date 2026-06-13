@@ -5,8 +5,13 @@ import { Product } from '../../../generated/prisma/client';
 
 type ProductData = Omit<ProductModel, 'id'>;
 
+const timer = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
+
 export class SqliteProductRepository implements ProductRepository {
   async findAll(userId: string): Promise<ProductModel[]> {
+
+    
+
     const products = await prisma.product.findMany({
       where: {
         userId: userId,
@@ -15,6 +20,8 @@ export class SqliteProductRepository implements ProductRepository {
         variants: true,
       },
     });
+
+    // await timer()
 
     return products;
   }

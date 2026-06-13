@@ -151,7 +151,7 @@ export function ProfileSecurity({
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         {/* Alterar senha */}
         <div className="space-y-4">
           <span className="text-sm text-secondary-dark flex items-center gap-1">
@@ -227,12 +227,12 @@ export function ProfileSecurity({
 
           <div className="w-full p-4 bg-background-normal/50 border border-secondary-light/20 rounded-lg space-y-4 mt-4">
             <div className="flex items-center gap-2">
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2 bg-white shadow-md rounded-lg p-2">
+              <div className="flex  items-center gap-4">
+                <div className="flex items-center gap-2 bg-white shadow-md rounded-lg p-2 shrink-0">
                   <img
                     src="/google.png"
                     alt="Imagem google"
-                    className="object-cover"
+                    className="object-cover w-full h-full"
                   />
                 </div>
 
@@ -247,9 +247,8 @@ export function ProfileSecurity({
               </div>
 
               <span
-                className={`px-2 py-1 rounded-full flex items-center gap-1 text-xs border  ml-auto ${
-                  account ? conectedStyle.conected : conectedStyle.disconected
-                }`}
+                className={`px-2 py-1 rounded-full flex items-center gap-1 text-xs border  ml-auto ${account ? conectedStyle.conected : conectedStyle.disconected
+                  }`}
               >
                 <FiCheck size={14} />
                 {account ? 'Conectado' : 'Desconectado'}

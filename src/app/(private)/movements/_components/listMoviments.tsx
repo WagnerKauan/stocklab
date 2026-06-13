@@ -1,12 +1,17 @@
 'use client';
 
 import Link from 'next/link';
-import { FiMoreHorizontal, FiSearch } from 'react-icons/fi';
+import { FiArrowRight, FiMoreHorizontal, FiSearch } from 'react-icons/fi';
 import { useEffect, useState } from 'react';
 import { MovementModel } from '@/models/movements/movements-model';
 import { CiFilter } from "react-icons/ci";
 import Image from 'next/image';
 import { Pagination } from '@/components/ui/pagination';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+} from "@/components/ui/carousel"
 
 type ListMovementsProps = {
   movements: MovementModel[];
@@ -143,56 +148,32 @@ export function ListMovements({ movements }: ListMovementsProps) {
               Período
             </label>
 
-            <div className="flex items-center gap-2">
-              <input
-                type="date"
-                className="
-            h-11
-            px-3
-            bg-background-normal
-            border border-secondary-light/20
-            rounded-lg
-            text-sm
-            text-secondary-normal
-            focus:outline-none
-            focus:border-primary-normal
-          "
-                onChange={e => setFromDate(e.target.value)}
-              />
+            <div className="flex items-center flex-wrap sm:flex-nowrap gap-2">
+              <div className="flex items-center gap-2 w-full">
+                <input
+                  type="date"
+                  className="h-11 px-1 sm:px-3 bg-background-normal border border-secondary-light/20 rounded-lg text-sm text-secondary-normal
+                focus:outline-none focus:border-primary-normal flex-1 "
+                  onChange={e => setFromDate(e.target.value)}
+                />
 
-              <span className="text-secondary-light text-sm">
-                até
-              </span>
 
-              <input
-                type="date"
-                className="
-            h-11
-            px-3
-            bg-background-normal
-            border border-secondary-light/20
-            rounded-lg
-            text-sm
-            text-secondary-normal
-            focus:outline-none
-            focus:border-primary-normal
-          "
-                onChange={e => setToDate(e.target.value)}
-              />
+                <FiArrowRight
+                  className="text-secondary-light"
+                />
+
+                <input
+                  type="date"
+                  className=" h-11 px-1 sm:px-3 bg-background-normal border border-secondary-light/20 rounded-lg text-sm
+                  text-secondary-normal focus:outline-none focus:border-primary-normal flex-1"
+                  onChange={e => setToDate(e.target.value)}
+                />
+              </div>
 
               <button
                 onClick={filterDate}
-                className="
-            h-11
-            px-4
-            flex items-center gap-2
-            rounded-lg
-            bg-primary-normal
-            text-white
-            hover:bg-primary-hover
-            transition-colors
-            cursor-pointer
-          "
+                className="h-11 px-4 flex items-center gap-2 rounded-lg bg-primary-normal text-white
+                hover:bg-primary-hover transition-colors cursor-pointer "
               >
                 <CiFilter size={18} />
                 <span className="text-sm font-medium">
@@ -208,7 +189,7 @@ export function ListMovements({ movements }: ListMovementsProps) {
       <div className='flex flex-col flex-1 justify-between'>
         <div className='flex flex-col'>
           {/* header table */}
-          <div className="hidden md:grid grid-cols-[2.5fr_1fr_1fr_1fr_1fr_80px] gap-4 bg-primary-normal text-white rounded-xl px-6 py-4 sticky top-0 z-10">
+          <div className="hidden md:grid grid-cols-[2fr_1fr_1fr_1fr_1fr_50px] gap-4 bg-primary-normal text-white rounded-xl px-6 py-4 sticky top-0 z-10">
             <span className="text-sm font-medium">Produto</span>
             <span className="text-sm font-medium">Variante</span>
             <span className="text-sm font-medium">Tipo</span>
@@ -228,7 +209,8 @@ export function ListMovements({ movements }: ListMovementsProps) {
                   className="bg-white border border-secondary-light/20 rounded-2xl p-4 transition-colors hover:bg-background-normal"
                 >
                   {/* Desktop */}
-                  <div className="hidden md:grid grid-cols-[2.5fr_1fr_1fr_1fr_1fr_80px] gap-4 items-center">
+                  <div className="hidden md:grid grid-cols-[2fr_1fr_1fr_1fr_1fr_50px] gap-4 items-center">
+
                     {/* Produto */}
                     <div className="flex items-center gap-3 min-w-0">
                       <div className="w-10 h-10 rounded-full overflow-hidden shrink-0">
@@ -252,10 +234,12 @@ export function ListMovements({ movements }: ListMovementsProps) {
                         </span>
                       </div>
                     </div>
+
                     {/* Variante */}
                     <span className="text-secondary-dark">
                       {variant.size}/{variant.color}
                     </span>
+
                     {/* Tipo */}
                     <span className="font-medium text-secondary-dark flex items-center gap-1">
                       {movement.type === 'IN' ? (
@@ -265,11 +249,13 @@ export function ListMovements({ movements }: ListMovementsProps) {
                       )}
                       {movement.type === 'IN' ? 'Entrada' : 'Saída'}
                     </span>
+
                     {/* Quantidade */}
-                    <span className="text-secondary-dark flex items-center gap-1">
+                    <span className="text-secondary-dark flex items-center gap-1 text-nowrap">
                       {movement.type === 'IN' ? '+' : '-'}
                       {movement.quantity} unidades
                     </span>
+
                     {/* Data */}
                     <div className="flex justify-center">
                       {movement.createdAt.toLocaleDateString('pt-BR', {
@@ -278,6 +264,7 @@ export function ListMovements({ movements }: ListMovementsProps) {
                         year: 'numeric',
                       })}
                     </div>
+
                     {/* Ações */}
                     <div className="flex justify-center">
                       <Link
@@ -291,9 +278,114 @@ export function ListMovements({ movements }: ListMovementsProps) {
                       </Link>
                     </div>
                   </div>
+
+
+                  {/* Mobile */}
+                  <div className="flex flex-col gap-4 md:hidden">
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-10 h-10 rounded-full overflow-hidden shrink-0">
+                          <Image
+                            src={
+                              product.productImage ||
+                              '/product/placeHolderProduct.png'
+                            }
+                            alt={product.name}
+                            width={40}
+                            height={40}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+
+                        <div className="flex flex-col min-w-0">
+                          <span className="font-medium text-secondary-dark truncate">
+                            {product.name}
+                          </span>
+
+                          <span className="text-sm text-secondary-light truncate">
+                            SKU: AC-TESTE-CAMISA
+                          </span>
+                        </div>
+                      </div>
+
+                      <Link
+                        className="cursor-pointer shink-0"
+                        href={`/products/${product.id}?variantId=${variant.id}`}
+                      >
+                        <FiMoreHorizontal
+                          size={20}
+                          className="text-secondary-dark hover:text-primary-normal transition-colors"
+                        />
+                      </Link>
+
+                    </div>
+                    <Carousel
+                      opts={{
+                        align: 'start',
+                        loop: false,
+                      }}
+                    >
+                      <CarouselContent className="-ml-4">
+                        {/* Variante */}
+                        <CarouselItem className="basis-1/3 pl-6">
+                          <span className="text-secondary-light block">
+                            Variante
+                          </span>
+                          <span className="text-secondary-dark font-medium">
+                            {variant.size}/{variant.color}
+                          </span>
+                        </CarouselItem>
+
+                        {/* Tipo */}
+                        <CarouselItem className="basis-1/3 pl-6">
+                          <span className="text-secondary-light block">
+                            Tipo
+                          </span>
+                          <span className="text-secondary-dark font-medium flex items-center gap-1">
+                            {movement.type === 'IN' ? (
+                              <div className="w-3 h-3 bg-success rounded-full" />
+                            ) : (
+                              <div className="w-3 h-3 bg-error rounded-full" />
+                            )}
+                            {movement.type === 'IN' ? 'Entrada' : 'Saída'}
+                          </span>
+                        </CarouselItem>
+
+                        {/* Quantidade */}
+                        <CarouselItem className="basis-1/3 pl-6">
+                          <span className="text-secondary-light block">
+                            Quantidade
+                          </span>
+                          <span className="text-secondary-dark font-medium flex items-center gap-1 text-nowrap">
+                            {movement.type === 'IN' ? '+' : '-'}
+                            {movement.quantity} unidades
+                          </span>
+                        </CarouselItem>
+
+                        {/* Data */}
+                        <CarouselItem className="basis-1/3 pl-6">
+                          <span className="text-secondary-light block">
+                            Data
+                          </span>
+                          <span className="text-secondary-dark font-medium">
+                            {
+                              movement.createdAt.toLocaleDateString('pt-BR', {
+                                day: '2-digit',
+                                month: '2-digit',
+                                year: 'numeric',
+                              })
+                            }
+                          </span>
+                        </CarouselItem>
+                      </CarouselContent>
+                    </Carousel>
+                  </div>
                 </div>
               );
             })}
+
+
+
           </div>
         </div>
         <Pagination itensPerPage={itensPerPage} totalItens={movements.length} setStartIndex={setStartIndex} selectedPage={selectedPage} />

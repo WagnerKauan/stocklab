@@ -57,10 +57,10 @@ export function ProfileDangerZone() {
             </div>
             <div className="flex flex-col">
               <span className="text-secondary-dark text-sm">
-                Excluir conta permanentemente.
+               Delete sua conta
               </span>
-              <span className="text-secondary-light text-[13px]">
-                Isso irá remover permanentemente sua conta e todos os dados associados.
+              <span className="text-secondary-light text-[13px] line-clamp-2">
+                Isso irá remover sua conta e todos os dados para sempre.
               </span>
             </div>
           </div>
@@ -68,7 +68,7 @@ export function ProfileDangerZone() {
           <button
             onClick={handleDeleteAccount} 
             className="px-4 py-2 rounded-md font-semibold border border-error/20 cursor-pointer text-sm text-error hover:bg-error/10 transition-colors">
-            Excluir conta
+            Deletar
           </button>
         </div>
       </div>
